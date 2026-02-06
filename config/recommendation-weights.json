@@ -1,0 +1,7 @@
+{
+  "compatibility": 40,
+  "capabilityCoverage": 25,
+  "maintenance": 15,
+  "adoption": 10,
+  "securityPenaltyMax": 30
+}
