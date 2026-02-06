@@ -27,5 +27,5 @@ jobs:
         run: npm run whitelist:verify
       - name: Ensure sync reproducibility
         run: |
-          npm run sync
+          SKILLS_MCPS_SYNC_OFFLINE=1 npm run sync
           git diff --exit-code data/catalog

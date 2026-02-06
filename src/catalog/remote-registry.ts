@@ -17,6 +17,10 @@ export async function resolveRegistryEntries(
   options: { updatedSince?: string } = {},
   fetchImpl: FetchLike = fetch as unknown as FetchLike
 ): Promise<unknown[]> {
+  if (process.env.SKILLS_MCPS_SYNC_OFFLINE === '1') {
+    return registry.entries;
+  }
+
   if (!registry.remote) {
     return registry.entries;
   }
