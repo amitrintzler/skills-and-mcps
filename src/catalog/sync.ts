@@ -23,8 +23,9 @@ export async function syncCatalogs(today = new Date().toISOString().slice(0, 10)
     const updatedSince = registry.remote?.supportsUpdatedSince
       ? getUpdatedSince(syncState, registry.id)
       : undefined;
-    const entries = await resolveRegistryEntries(registry, { updatedSince });
-    const adaptedEntries = adaptRegistryEntries(registry, entries);
+    const resolved = await resolveRegistryEntries(registry, { updatedSince });
+    const adaptedEntries =
+      resolved.source === 'remote' ? adaptRegistryEntries(registry, resolved.entries) : resolved.entries;
 
     if (registry.kind === 'skill') {
       allSkills.push(...normalizeSkills(adaptedEntries, registry.id, today));
@@ -34,7 +35,7 @@ export async function syncCatalogs(today = new Date().toISOString().slice(0, 10)
       allMcps.push(...normalizeMcps(adaptedEntries, registry.id, today));
     }
 
-    if (registry.remote?.supportsUpdatedSince && entries !== registry.entries) {
+    if (registry.remote?.supportsUpdatedSince && resolved.source === 'remote') {
       syncState = setUpdatedSince(syncState, registry.id, new Date().toISOString());
     }
   }

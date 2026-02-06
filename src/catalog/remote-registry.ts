@@ -12,17 +12,22 @@ interface FetchLike {
   (input: string, init?: RequestInit): Promise<FetchLikeResponse>;
 }
 
+export interface ResolvedRegistryEntries {
+  entries: unknown[];
+  source: 'remote' | 'local';
+}
+
 export async function resolveRegistryEntries(
   registry: Registry,
   options: { updatedSince?: string } = {},
   fetchImpl: FetchLike = fetch as unknown as FetchLike
-): Promise<unknown[]> {
+): Promise<ResolvedRegistryEntries> {
   if (process.env.SKILLS_MCPS_SYNC_OFFLINE === '1') {
-    return registry.entries;
+    return { entries: registry.entries, source: 'local' };
   }
 
   if (!registry.remote) {
-    return registry.entries;
+    return { entries: registry.entries, source: 'local' };
   }
 
   try {
@@ -32,17 +37,17 @@ export async function resolveRegistryEntries(
       logger.warn(
         `Remote registry ${registry.id} returned no entries; using ${registry.entries.length} local fallback entries`
       );
-      return registry.entries;
+      return { entries: registry.entries, source: 'local' };
     }
 
-    return parsed;
+    return { entries: parsed, source: 'remote' };
   } catch (error) {
     if (registry.remote.fallbackToLocal && registry.entries.length > 0) {
       logger.warn(
         `Remote registry ${registry.id} fetch failed; using ${registry.entries.length} local fallback entries`,
         error
       );
-      return registry.entries;
+      return { entries: registry.entries, source: 'local' };
     }
 
     throw error;

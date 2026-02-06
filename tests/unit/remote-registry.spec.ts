@@ -21,19 +21,24 @@ describe('resolveRegistryEntries', () => {
       }
     });
 
-    const entries = await resolveRegistryEntries(registry, { updatedSince: '2026-01-01T00:00:00.000Z' }, async (url) => {
+    const result = await resolveRegistryEntries(
+      registry,
+      { updatedSince: '2026-01-01T00:00:00.000Z' },
+      async (url) => {
       expect(url).toContain('updated_since=2026-01-01T00%3A00%3A00.000Z');
       return {
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      async json() {
-        return [{ id: 'skill:a' }];
-      }
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        async json() {
+          return [{ id: 'skill:a' }];
+        }
       };
-    });
+      }
+    );
 
-    expect(entries).toEqual([{ id: 'skill:a' }]);
+    expect(result.entries).toEqual([{ id: 'skill:a' }]);
+    expect(result.source).toBe('remote');
   });
 
   it('extracts entries from catalog-json path', async () => {
@@ -58,30 +63,31 @@ describe('resolveRegistryEntries', () => {
     });
 
     const calls: string[] = [];
-    const entries = await resolveRegistryEntries(registry, {}, async (url) => {
-      calls.push(url);
-      if (url.includes('cursor=')) {
+    const result = await resolveRegistryEntries(registry, {}, async (url) => {
+        calls.push(url);
+        if (url.includes('cursor=')) {
+          return {
+            ok: true,
+            status: 200,
+            statusText: 'OK',
+            async json() {
+              return { payload: { items: [{ id: 'mcp:b' }] }, meta: {} };
+            }
+          };
+        }
+
         return {
           ok: true,
           status: 200,
           statusText: 'OK',
           async json() {
-            return { payload: { items: [{ id: 'mcp:b' }] }, meta: {} };
+            return { payload: { items: [{ id: 'mcp:a' }] }, meta: { nextCursor: 'abc' } };
           }
         };
-      }
+      });
 
-      return {
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        async json() {
-          return { payload: { items: [{ id: 'mcp:a' }] }, meta: { nextCursor: 'abc' } };
-        }
-      };
-    });
-
-    expect(entries).toEqual([{ id: 'mcp:a' }, { id: 'mcp:b' }]);
+    expect(result.entries).toEqual([{ id: 'mcp:a' }, { id: 'mcp:b' }]);
+    expect(result.source).toBe('remote');
     expect(calls.length).toBe(2);
   });
 
@@ -100,10 +106,11 @@ describe('resolveRegistryEntries', () => {
       }
     });
 
-    const entries = await resolveRegistryEntries(registry, {}, async () => {
+    const result = await resolveRegistryEntries(registry, {}, async () => {
       throw new Error('Network unavailable');
     });
 
-    expect(entries).toEqual([{ id: 'skill:local' }]);
+    expect(result.entries).toEqual([{ id: 'skill:local' }]);
+    expect(result.source).toBe('local');
   });
 });

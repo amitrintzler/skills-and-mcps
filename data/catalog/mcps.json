@@ -4,11 +4,25 @@
     "name": "Filesystem MCP Server",
     "transport": "stdio",
     "authModel": "none",
-    "capabilities": ["file-read", "file-write"],
-    "compatibility": ["container", "node", "python"],
+    "capabilities": [
+      "file-read",
+      "file-write"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "container"
+    ],
     "source": "public-mcp-directory",
     "lastSeenAt": "2026-02-06",
-    "install": { "kind": "skill.sh", "target": "mcp-filesystem", "args": ["--transport", "stdio"] },
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-filesystem",
+      "args": [
+        "--transport",
+        "stdio"
+      ]
+    },
     "adoptionSignal": 84,
     "maintenanceSignal": 81,
     "securitySignals": {
@@ -24,11 +38,23 @@
     "name": "Remote Browser MCP",
     "transport": "http",
     "authModel": "api_key",
-    "capabilities": ["automation", "browser-control"],
-    "compatibility": ["node"],
+    "capabilities": [
+      "browser-control",
+      "automation"
+    ],
+    "compatibility": [
+      "node"
+    ],
     "source": "public-mcp-directory",
     "lastSeenAt": "2026-02-06",
-    "install": { "kind": "skill.sh", "target": "mcp-remote-browser", "args": ["--transport", "http"] },
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-remote-browser",
+      "args": [
+        "--transport",
+        "http"
+      ]
+    },
     "adoptionSignal": 66,
     "maintenanceSignal": 58,
     "securitySignals": {
