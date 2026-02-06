@@ -1,0 +1,61 @@
+[
+  {
+    "id": "skill:fast-web-scrape",
+    "name": "Fast Web Scrape",
+    "description": "High-throughput data extraction helpers for websites.",
+    "capabilities": [
+      "scraping",
+      "automation"
+    ],
+    "compatibility": [
+      "node"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-06",
+    "install": {
+      "kind": "skill.sh",
+      "target": "fast-web-scrape",
+      "args": []
+    },
+    "adoptionSignal": 62,
+    "maintenanceSignal": 55,
+    "securitySignals": {
+      "knownVulnerabilities": 1,
+      "suspiciousPatterns": 1,
+      "injectionFindings": 1,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    }
+  },
+  {
+    "id": "skill:secure-prompting",
+    "name": "Secure Prompting",
+    "description": "Prompt hardening patterns for high-safety agent workloads.",
+    "capabilities": [
+      "prompting",
+      "security",
+      "guardrails"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "general"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-06",
+    "install": {
+      "kind": "skill.sh",
+      "target": "secure-prompting",
+      "args": []
+    },
+    "adoptionSignal": 78,
+    "maintenanceSignal": 83,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    }
+  }
+]

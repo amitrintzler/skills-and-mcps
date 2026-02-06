@@ -1,0 +1,49 @@
+name: Daily Security
+
+on:
+  schedule:
+    - cron: '12 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  daily-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Sync latest catalog
+        run: npm run sync
+
+      - name: Verify whitelist
+        run: npm run dev -- whitelist verify --allow-failures
+
+      - name: Apply quarantine from latest report
+        run: |
+          REPORT=$(ls -1t data/security-reports/*/report.json | head -n 1)
+          npm run quarantine:apply -- --report "$REPORT"
+
+      - name: Create quarantine PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(security): daily quarantine update"
+          title: "chore(security): daily quarantine update"
+          body: |
+            Automated daily security verification updated whitelist/quarantine state.
+            - Synced catalog
+            - Re-ran whitelist risk/injection checks
+            - Applied quarantine for failing entries
+          branch: chore/daily-security-quarantine
+          delete-branch: true

@@ -1,0 +1,8 @@
+useCase: "agent"
+stack:
+  - "node"
+deployment: "local"
+securityPosture: "strict"
+requiredCapabilities:
+  - "security"
+  - "guardrails"
