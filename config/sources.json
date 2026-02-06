@@ -1,0 +1,30 @@
+{
+  "skills": [
+    {
+      "id": "skills-2024-06-05",
+      "file": "data/raw/2024-06-05/skills.json",
+      "priority": 2,
+      "attribution": "Market pulse refresh"
+    },
+    {
+      "id": "skills-2024-05-20",
+      "file": "data/raw/2024-05-20/skills.json",
+      "priority": 1,
+      "attribution": "Compensation operations survey"
+    }
+  ],
+  "mcps": [
+    {
+      "id": "mcps-2024-06-05",
+      "file": "data/raw/2024-06-05/mcps.json",
+      "priority": 2,
+      "attribution": "Vendor benchmark - Q2"
+    },
+    {
+      "id": "mcps-2024-05-15",
+      "file": "data/raw/2024-05-15/mcps.json",
+      "priority": 1,
+      "attribution": "Internal finance calibration"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "approved": [
+    "mcp:filesystem",
+    "skill:secure-prompting"
+  ]
+}

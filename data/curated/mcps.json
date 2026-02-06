@@ -1,0 +1,78 @@
+[
+  {
+    "jobFamily": "Agent Experience",
+    "level": "Mid",
+    "currency": "USD",
+    "baseRange": {
+      "min": 125000,
+      "mid": 140000,
+      "max": 155000
+    },
+    "geoModifier": {
+      "Remote": 1,
+      "DAL": 0.92
+    },
+    "skillLinks": [
+      "skill:agent-handoff"
+    ],
+    "lastBenchmark": "2024-06-02"
+  },
+  {
+    "jobFamily": "AI Platform",
+    "level": "Senior",
+    "currency": "USD",
+    "baseRange": {
+      "min": 180000,
+      "mid": 210000,
+      "max": 240000
+    },
+    "geoModifier": {
+      "NYC": 1.12,
+      "LON": 1.08,
+      "Remote": 1
+    },
+    "skillLinks": [
+      "skill:ai-assurance",
+      "skill:data-contracts"
+    ],
+    "lastBenchmark": "2024-06-05"
+  },
+  {
+    "jobFamily": "Compensation Operations",
+    "level": "Lead",
+    "currency": "USD",
+    "baseRange": {
+      "min": 120000,
+      "mid": 138000,
+      "max": 150000
+    },
+    "geoModifier": {
+      "Remote": 1,
+      "AMS": 0.98,
+      "BGL": 0.85
+    },
+    "skillLinks": [
+      "skill:mcp-ops"
+    ],
+    "lastBenchmark": "2024-05-12"
+  },
+  {
+    "jobFamily": "Data Infrastructure",
+    "level": "Mid",
+    "currency": "USD",
+    "baseRange": {
+      "min": 135000,
+      "mid": 152000,
+      "max": 168000
+    },
+    "geoModifier": {
+      "SFO": 1.15,
+      "BER": 0.95,
+      "Remote": 0.92
+    },
+    "skillLinks": [
+      "skill:data-contracts"
+    ],
+    "lastBenchmark": "2024-05-10"
+  }
+]

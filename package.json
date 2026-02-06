@@ -1,0 +1,44 @@
+{
+  "name": "skills-and-mcps",
+  "version": "0.1.0",
+  "description": "Public Skills + MCP security recommendation framework",
+  "private": false,
+  "type": "module",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "dev": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate:data": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/validate-data.ts",
+    "ingest:skills": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts",
+    "ingest:mcps": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts",
+    "ingest:all": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts",
+    "sync": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts sync",
+    "recommend": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts recommend",
+    "assess": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts assess",
+    "install:item": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts install",
+    "whitelist:verify": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts whitelist verify",
+    "quarantine:apply": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts quarantine apply"
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "globby": "^14.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.0"
+  }
+}

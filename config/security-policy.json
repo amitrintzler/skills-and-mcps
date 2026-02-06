@@ -1,0 +1,19 @@
+{
+  "thresholds": {
+    "lowMax": 24,
+    "mediumMax": 49,
+    "highMax": 74,
+    "criticalMax": 100
+  },
+  "installGate": {
+    "blockTiers": ["high", "critical"],
+    "warnTiers": ["medium"]
+  },
+  "scoring": {
+    "vulnerabilityWeight": 15,
+    "suspiciousWeight": 10,
+    "injectionWeight": 12,
+    "exfiltrationWeight": 12,
+    "integrityWeight": 10
+  }
+}

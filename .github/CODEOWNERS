@@ -1,0 +1,5 @@
+config/security-policy.json @amitri
+config/recommendation-weights.json @amitri
+data/whitelist/approved.json @amitri
+data/quarantine/quarantined.json @amitri
+docs/security/ @amitri
