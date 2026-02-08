@@ -62,7 +62,10 @@ export async function loadQuarantine(): Promise<QuarantineEntry[]> {
 }
 
 export async function saveQuarantine(entries: QuarantineEntry[]): Promise<void> {
+  const existing = await loadQuarantine();
   const deduped = new Map<string, QuarantineEntry>();
+
+  existing.forEach((entry) => deduped.set(entry.id, entry));
   entries.forEach((entry) => deduped.set(entry.id, entry));
 
   const sorted = Array.from(deduped.values()).sort((a, b) => a.id.localeCompare(b.id));
