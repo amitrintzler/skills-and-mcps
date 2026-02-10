@@ -1,9 +1,10 @@
 [
   {
     "id": "mcp:filesystem",
+    "kind": "mcp",
     "name": "Filesystem MCP Server",
-    "transport": "stdio",
-    "authModel": "none",
+    "description": "Access local files in read/write mode.",
+    "provider": "mcp",
     "capabilities": [
       "file-read",
       "file-write"
@@ -14,7 +15,9 @@
       "container"
     ],
     "source": "public-mcp-directory",
-    "lastSeenAt": "2026-02-06",
+    "lastSeenAt": "2026-02-10",
+    "transport": "stdio",
+    "authModel": "none",
     "install": {
       "kind": "skill.sh",
       "target": "mcp-filesystem",
@@ -25,19 +28,23 @@
     },
     "adoptionSignal": 84,
     "maintenanceSignal": 81,
+    "provenanceSignal": 95,
+    "freshnessSignal": 70,
     "securitySignals": {
       "knownVulnerabilities": 0,
       "suspiciousPatterns": 1,
       "injectionFindings": 0,
       "exfiltrationSignals": 0,
       "integrityAlerts": 0
-    }
+    },
+    "metadata": {}
   },
   {
     "id": "mcp:remote-browser",
+    "kind": "mcp",
     "name": "Remote Browser MCP",
-    "transport": "http",
-    "authModel": "api_key",
+    "description": "Remote browser automation via network transport.",
+    "provider": "mcp",
     "capabilities": [
       "browser-control",
       "automation"
@@ -46,7 +53,9 @@
       "node"
     ],
     "source": "public-mcp-directory",
-    "lastSeenAt": "2026-02-06",
+    "lastSeenAt": "2026-02-10",
+    "transport": "http",
+    "authModel": "api_key",
     "install": {
       "kind": "skill.sh",
       "target": "mcp-remote-browser",
@@ -57,12 +66,15 @@
     },
     "adoptionSignal": 66,
     "maintenanceSignal": 58,
+    "provenanceSignal": 88,
+    "freshnessSignal": 64,
     "securitySignals": {
       "knownVulnerabilities": 1,
       "suspiciousPatterns": 2,
       "injectionFindings": 1,
       "exfiltrationSignals": 1,
       "integrityAlerts": 0
-    }
+    },
+    "metadata": {}
   }
 ]

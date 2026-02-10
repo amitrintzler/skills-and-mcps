@@ -30,8 +30,10 @@ describe('buildAssessment', () => {
     const assessment = buildAssessment(
       {
         id: 'skill:test',
+        kind: 'skill',
         name: 'Test',
         description: 'desc',
+        provider: 'openai',
         capabilities: ['x'],
         compatibility: ['node'],
         source: 'x',
@@ -39,6 +41,8 @@ describe('buildAssessment', () => {
         install: { kind: 'skill.sh', target: 'x', args: [] },
         adoptionSignal: 50,
         maintenanceSignal: 50,
+        provenanceSignal: 80,
+        freshnessSignal: 60,
         securitySignals: {
           knownVulnerabilities: 1,
           suspiciousPatterns: 1,

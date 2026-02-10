@@ -142,13 +142,27 @@ export function extractEntries(
   }
 
   const base = payload as Record<string, unknown>;
-  const resolved = entryPath ? resolveByPath(base, entryPath) : base[kind === 'skill' ? 'skills' : 'mcps'];
+  const defaultKey = defaultCatalogKeyByKind(kind);
+  const resolved = entryPath ? resolveByPath(base, entryPath) : base[defaultKey];
 
   if (!Array.isArray(resolved)) {
-    throw new Error(`Expected resolved catalog entries to be an array at path: ${entryPath ?? kind}`);
+    throw new Error(`Expected resolved catalog entries to be an array at path: ${entryPath ?? defaultKey}`);
   }
 
   return resolved;
+}
+
+function defaultCatalogKeyByKind(kind: Registry['kind']): string {
+  if (kind === 'mcp') {
+    return 'mcps';
+  }
+  if (kind === 'claude-plugin') {
+    return 'plugins';
+  }
+  if (kind === 'copilot-extension') {
+    return 'extensions';
+  }
+  return 'skills';
 }
 
 function resolveByPath(value: Record<string, unknown>, path: string): unknown {

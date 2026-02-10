@@ -1,0 +1,14 @@
+{
+  "weights": {
+    "compatibility": 25,
+    "capabilityCoverage": 20,
+    "maintenance": 18,
+    "provenance": 18,
+    "adoption": 12,
+    "freshnessBonusMax": 8,
+    "securityPenaltyMax": 40,
+    "blockedPenalty": 40
+  },
+  "tieBreakers": ["trust", "risk", "name"],
+  "blockedFloorTier": "high"
+}

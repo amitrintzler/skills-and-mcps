@@ -1,0 +1,46 @@
+{
+  "providers": [
+    {
+      "id": "mcp",
+      "enabled": true,
+      "officialOnly": true,
+      "trustLevel": "high",
+      "poll": {
+        "mode": "daily",
+        "rateLimitPerMinute": 120
+      }
+    },
+    {
+      "id": "openai",
+      "enabled": true,
+      "officialOnly": false,
+      "trustLevel": "medium",
+      "poll": {
+        "mode": "daily",
+        "rateLimitPerMinute": 60
+      }
+    },
+    {
+      "id": "anthropic",
+      "enabled": true,
+      "officialOnly": true,
+      "trustLevel": "high",
+      "authEnv": "ANTHROPIC_API_KEY",
+      "poll": {
+        "mode": "daily",
+        "rateLimitPerMinute": 60
+      }
+    },
+    {
+      "id": "github",
+      "enabled": true,
+      "officialOnly": true,
+      "authEnv": "GITHUB_TOKEN",
+      "trustLevel": "high",
+      "poll": {
+        "mode": "daily",
+        "rateLimitPerMinute": 90
+      }
+    }
+  ]
+}

@@ -4,12 +4,17 @@
       "id": "community-skills-index",
       "kind": "skill",
       "sourceType": "community-list",
+      "adapter": "openai-skills-v1",
       "enabled": true,
+      "officialOnly": false,
       "remote": {
         "url": "https://raw.githubusercontent.com/amitri/skills-and-mcps/main/data/catalog/skills.json",
         "format": "json-array",
         "timeoutMs": 10000,
-        "fallbackToLocal": true
+        "fallbackToLocal": true,
+        "provider": "openai",
+        "official": false,
+        "licenseHint": "community"
       },
       "entries": [
         {
@@ -21,6 +26,8 @@
           "install": { "kind": "skill.sh", "target": "secure-prompting", "args": [] },
           "adoptionSignal": 78,
           "maintenanceSignal": 83,
+          "provenanceSignal": 75,
+          "freshnessSignal": 60,
           "securitySignals": {
             "knownVulnerabilities": 0,
             "suspiciousPatterns": 0,
@@ -38,6 +45,8 @@
           "install": { "kind": "skill.sh", "target": "fast-web-scrape", "args": [] },
           "adoptionSignal": 62,
           "maintenanceSignal": 55,
+          "provenanceSignal": 40,
+          "freshnessSignal": 50,
           "securitySignals": {
             "knownVulnerabilities": 1,
             "suspiciousPatterns": 1,
@@ -54,6 +63,7 @@
       "sourceType": "public-index",
       "adapter": "mcp-registry-v0.1",
       "enabled": true,
+      "officialOnly": true,
       "remote": {
         "url": "https://registry.modelcontextprotocol.io/v0.1/servers",
         "format": "catalog-json",
@@ -68,12 +78,16 @@
           "limit": 100
         },
         "timeoutMs": 10000,
-        "fallbackToLocal": true
+        "fallbackToLocal": true,
+        "provider": "mcp",
+        "official": true,
+        "licenseHint": "registry"
       },
       "entries": [
         {
           "id": "mcp:filesystem",
           "name": "Filesystem MCP Server",
+          "description": "Access local files in read/write mode.",
           "transport": "stdio",
           "authModel": "none",
           "capabilities": ["file-read", "file-write"],
@@ -81,6 +95,8 @@
           "install": { "kind": "skill.sh", "target": "mcp-filesystem", "args": ["--transport", "stdio"] },
           "adoptionSignal": 84,
           "maintenanceSignal": 81,
+          "provenanceSignal": 95,
+          "freshnessSignal": 70,
           "securitySignals": {
             "knownVulnerabilities": 0,
             "suspiciousPatterns": 1,
@@ -92,6 +108,7 @@
         {
           "id": "mcp:remote-browser",
           "name": "Remote Browser MCP",
+          "description": "Remote browser automation via network transport.",
           "transport": "http",
           "authModel": "api_key",
           "capabilities": ["browser-control", "automation"],
@@ -99,11 +116,95 @@
           "install": { "kind": "skill.sh", "target": "mcp-remote-browser", "args": ["--transport", "http"] },
           "adoptionSignal": 66,
           "maintenanceSignal": 58,
+          "provenanceSignal": 88,
+          "freshnessSignal": 64,
           "securitySignals": {
             "knownVulnerabilities": 1,
             "suspiciousPatterns": 2,
             "injectionFindings": 1,
             "exfiltrationSignals": 1,
+            "integrityAlerts": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "official-claude-plugins",
+      "kind": "claude-plugin",
+      "sourceType": "vendor-feed",
+      "adapter": "claude-plugins-v0.1",
+      "enabled": true,
+      "officialOnly": true,
+      "remote": {
+        "url": "https://api.anthropic.com/v1/plugins/catalog",
+        "format": "catalog-json",
+        "entryPath": "plugins",
+        "supportsUpdatedSince": true,
+        "updatedSinceParam": "updated_since",
+        "timeoutMs": 10000,
+        "fallbackToLocal": true,
+        "provider": "anthropic",
+        "official": true,
+        "licenseHint": "vendor"
+      },
+      "entries": [
+        {
+          "id": "claude-plugin:workspace-ops",
+          "name": "Workspace Ops",
+          "description": "Manage internal docs and tickets from Claude.",
+          "capabilities": ["tickets", "docs", "search"],
+          "compatibility": ["claude", "general"],
+          "install": { "kind": "manual", "instructions": "Enable from Claude plugin catalog." },
+          "adoptionSignal": 58,
+          "maintenanceSignal": 72,
+          "provenanceSignal": 96,
+          "freshnessSignal": 68,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "official-copilot-extensions",
+      "kind": "copilot-extension",
+      "sourceType": "vendor-feed",
+      "adapter": "copilot-extensions-v0.1",
+      "enabled": true,
+      "officialOnly": true,
+      "remote": {
+        "url": "https://api.github.com/copilot/extensions/catalog",
+        "format": "catalog-json",
+        "entryPath": "extensions",
+        "supportsUpdatedSince": true,
+        "updatedSinceParam": "updated_since",
+        "timeoutMs": 10000,
+        "fallbackToLocal": true,
+        "provider": "github",
+        "official": true,
+        "licenseHint": "vendor"
+      },
+      "entries": [
+        {
+          "id": "copilot-extension:repo-security",
+          "name": "Repo Security Insights",
+          "description": "Surface dependency, code scanning, and secret findings inside Copilot.",
+          "capabilities": ["security", "dependency-audit", "code-scanning"],
+          "compatibility": ["copilot", "github", "node", "python"],
+          "install": { "kind": "gh-cli", "target": "copilot-extension", "args": ["install", "repo-security"] },
+          "adoptionSignal": 64,
+          "maintenanceSignal": 75,
+          "provenanceSignal": 97,
+          "freshnessSignal": 72,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
             "integrityAlerts": 0
           }
         }

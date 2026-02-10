@@ -1,52 +1,180 @@
-import { loadRegistries } from '../config/runtime.js';
+import { loadProviders, loadRegistries } from '../config/runtime.js';
 import { logger } from '../lib/logger.js';
-import type { CatalogMcpServer, CatalogSkill } from '../lib/validation/contracts.js';
-import { mergeMcpsById, normalizeMcps } from '../mcps/normalize.js';
-import { mergeSkillsById, normalizeSkills } from '../skills/normalize.js';
+import { CatalogItemSchema, type CatalogItem, type CatalogKind, type Registry } from '../lib/validation/contracts.js';
 import { adaptRegistryEntries } from './adapter.js';
 import { resolveRegistryEntries } from './remote-registry.js';
-import { getUpdatedSince, loadSyncState, saveSyncState, setUpdatedSince } from './sync-state.js';
+import {
+  getStaleRegistries,
+  getUpdatedSince,
+  loadSyncState,
+  saveSyncState,
+  setSuccessfulSync,
+  setUpdatedSince
+} from './sync-state.js';
 
-import { saveMcpsCatalog, saveSkillsCatalog } from './repository.js';
+import { saveCatalogItems, saveLegacyCatalogViews } from './repository.js';
 
-export async function syncCatalogs(today = new Date().toISOString().slice(0, 10)): Promise<{
-  skills: CatalogSkill[];
-  mcps: CatalogMcpServer[];
+export interface SyncCatalogOptions {
+  kinds?: CatalogKind[];
+}
+
+export async function syncCatalogs(
+  today = new Date().toISOString().slice(0, 10),
+  options: SyncCatalogOptions = {}
+): Promise<{
+  items: CatalogItem[];
+  staleRegistries: string[];
 }> {
-  const registries = await loadRegistries();
+  const [registries, providers] = await Promise.all([loadRegistries(), loadProviders()]);
   let syncState = await loadSyncState();
 
-  const allSkills: CatalogSkill[] = [];
-  const allMcps: CatalogMcpServer[] = [];
+  const selectedKinds = options.kinds?.length ? new Set(options.kinds) : null;
+  const allItems: CatalogItem[] = [];
 
   for (const registry of registries) {
-    const updatedSince = registry.remote?.supportsUpdatedSince
-      ? getUpdatedSince(syncState, registry.id)
-      : undefined;
+    if (selectedKinds && !selectedKinds.has(registry.kind)) {
+      continue;
+    }
+
+    if (registry.remote?.provider) {
+      const provider = providers.get(registry.remote.provider);
+      if (provider && provider.officialOnly && registry.sourceType === 'community-list' && !registry.officialOnly) {
+        logger.warn(`Skipping non-official registry ${registry.id} due to provider policy (${provider.id})`);
+        continue;
+      }
+    }
+
+    const updatedSince = registry.remote?.supportsUpdatedSince ? getUpdatedSince(syncState, registry.id) : undefined;
+
     const resolved = await resolveRegistryEntries(registry, { updatedSince });
-    const adaptedEntries =
-      resolved.source === 'remote' ? adaptRegistryEntries(registry, resolved.entries) : resolved.entries;
+    const adaptedEntries = resolved.source === 'remote' ? adaptRegistryEntries(registry, resolved.entries) : resolved.entries;
 
-    if (registry.kind === 'skill') {
-      allSkills.push(...normalizeSkills(adaptedEntries, registry.id, today));
-    }
+    allItems.push(...normalizeItems(adaptedEntries, registry, today));
 
-    if (registry.kind === 'mcp') {
-      allMcps.push(...normalizeMcps(adaptedEntries, registry.id, today));
-    }
+    const nowStamp = new Date().toISOString();
+    syncState = setSuccessfulSync(syncState, registry.id, nowStamp);
 
     if (registry.remote?.supportsUpdatedSince && resolved.source === 'remote') {
-      syncState = setUpdatedSince(syncState, registry.id, new Date().toISOString());
+      syncState = setUpdatedSince(syncState, registry.id, nowStamp);
     }
   }
 
-  const mergedSkills = mergeSkillsById(allSkills);
-  const mergedMcps = mergeMcpsById(allMcps);
+  const mergedItems = mergeItemsById(allItems);
 
-  await Promise.all([saveSkillsCatalog(mergedSkills), saveMcpsCatalog(mergedMcps)]);
+  await Promise.all([saveCatalogItems(mergedItems), saveLegacyCatalogViews(mergedItems)]);
   await saveSyncState(syncState);
 
-  logger.info(`Synced ${mergedSkills.length} skills and ${mergedMcps.length} MCP servers`);
+  const kindCounts = countByKind(mergedItems);
+  logger.info(
+    `Synced ${mergedItems.length} items (${kindCounts.skill} skills, ${kindCounts.mcp} MCPs, ${kindCounts['claude-plugin']} Claude plugins, ${kindCounts['copilot-extension']} Copilot extensions)`
+  );
 
-  return { skills: mergedSkills, mcps: mergedMcps };
+  const staleRegistries = getStaleRegistries(syncState);
+
+  if (staleRegistries.length > 0) {
+    logger.warn(`Stale registries (>48h without success): ${staleRegistries.join(', ')}`);
+  }
+
+  return { items: mergedItems, staleRegistries };
+}
+
+function normalizeItems(records: unknown[], registry: Registry, today: string): CatalogItem[] {
+  return records
+    .map((entry) => {
+      const value = ensureObject(entry);
+      return CatalogItemSchema.parse({
+        ...value,
+        id: normalizeId(String(value.id ?? ''), registry.kind),
+        kind: value.kind ?? registry.kind,
+        provider: value.provider ?? registry.remote?.provider ?? inferProviderFromKind(registry.kind),
+        source: value.source ?? registry.id,
+        lastSeenAt: value.lastSeenAt ?? today
+      });
+    })
+    .sort((a, b) => a.id.localeCompare(b.id));
+}
+
+function ensureObject(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('Invalid registry entry: expected object');
+  }
+  return value as Record<string, unknown>;
+}
+
+function normalizeId(id: string, kind: CatalogKind): string {
+  if (id.startsWith(`${kind}:`)) {
+    return id;
+  }
+
+  const prefixMap: Record<CatalogKind, string> = {
+    skill: 'skill',
+    mcp: 'mcp',
+    'claude-plugin': 'claude-plugin',
+    'copilot-extension': 'copilot-extension'
+  };
+
+  return `${prefixMap[kind]}:${id.replace(/^([a-z-]+):/, '')}`;
+}
+
+function inferProviderFromKind(kind: CatalogKind): string {
+  if (kind === 'mcp') {
+    return 'mcp';
+  }
+  if (kind === 'claude-plugin') {
+    return 'anthropic';
+  }
+  if (kind === 'copilot-extension') {
+    return 'github';
+  }
+  return 'openai';
+}
+
+function mergeItemsById(items: CatalogItem[]): CatalogItem[] {
+  const state = new Map<string, CatalogItem>();
+
+  for (const item of items) {
+    const existing = state.get(item.id);
+    if (!existing) {
+      state.set(item.id, item);
+      continue;
+    }
+
+    state.set(item.id, {
+      ...existing,
+      name: item.name.length > existing.name.length ? item.name : existing.name,
+      description: item.description.length > existing.description.length ? item.description : existing.description,
+      capabilities: dedupe([...existing.capabilities, ...item.capabilities]),
+      compatibility: dedupe([...existing.compatibility, ...item.compatibility]),
+      maintenanceSignal: Math.max(existing.maintenanceSignal, item.maintenanceSignal),
+      adoptionSignal: Math.max(existing.adoptionSignal, item.adoptionSignal),
+      provenanceSignal: Math.max(existing.provenanceSignal, item.provenanceSignal),
+      freshnessSignal: Math.max(existing.freshnessSignal, item.freshnessSignal),
+      lastSeenAt: item.lastSeenAt >= existing.lastSeenAt ? item.lastSeenAt : existing.lastSeenAt,
+      metadata: {
+        ...existing.metadata,
+        ...item.metadata
+      }
+    });
+  }
+
+  return Array.from(state.values()).sort((a, b) => a.id.localeCompare(b.id));
+}
+
+function dedupe(values: string[]): string[] {
+  return Array.from(new Set(values.filter((value) => value.trim().length > 0))).sort((a, b) => a.localeCompare(b));
+}
+
+function countByKind(items: CatalogItem[]): Record<CatalogKind, number> {
+  return items.reduce<Record<CatalogKind, number>>(
+    (acc, item) => {
+      acc[item.kind] += 1;
+      return acc;
+    },
+    {
+      skill: 0,
+      mcp: 0,
+      'claude-plugin': 0,
+      'copilot-extension': 0
+    }
+  );
 }

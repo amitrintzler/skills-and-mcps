@@ -1,9 +1,10 @@
 import path from 'node:path';
 
 import { syncCatalogs } from '../../catalog/sync.js';
-import { loadCatalogById } from '../../catalog/repository.js';
+import { loadCatalogItemById } from '../../catalog/repository.js';
 import { installWithSkillSh } from '../../install/skillsh.js';
 import { logger } from '../../lib/logger.js';
+import { CatalogKindSchema, type CatalogKind } from '../../lib/validation/contracts.js';
 import { detectProjectSignals } from '../../recommendation/project-analysis.js';
 import { recommend } from '../../recommendation/engine.js';
 import { loadRequirementsProfile } from '../../recommendation/requirements.js';
@@ -15,7 +16,7 @@ export async function runCli(argv: string[]): Promise<void> {
 
   switch (command) {
     case 'sync':
-      await syncCatalogs();
+      await handleSync(rest);
       return;
     case 'recommend':
       await handleRecommend(rest);
@@ -38,29 +39,39 @@ export async function runCli(argv: string[]): Promise<void> {
   }
 }
 
+async function handleSync(args: string[]): Promise<void> {
+  const kinds = readKinds(args);
+  const result = await syncCatalogs(undefined, { kinds });
+
+  if (result.staleRegistries.length > 0) {
+    logger.warn(`Stale registries: ${result.staleRegistries.join(', ')}`);
+  }
+}
+
 async function handleRecommend(args: string[]): Promise<void> {
   const project = readFlag(args, '--project') ?? '.';
   const requirementsFile = readFlag(args, '--requirements');
   const format = readFlag(args, '--format') ?? 'table';
+  const kinds = readKinds(args);
 
   const [projectSignals, requirements] = await Promise.all([
     detectProjectSignals(path.resolve(project)),
     loadRequirementsProfile(requirementsFile)
   ]);
 
-  const ranked = await recommend({ projectSignals, requirements });
+  const ranked = await recommend({ projectSignals, requirements, kinds });
 
   if (format === 'json') {
     console.log(JSON.stringify(ranked, null, 2));
     return;
   }
 
-  console.log('ID\tTYPE\tSCORE\tRISK\tBLOCKED');
+  console.log('ID\tTYPE\tPROVIDER\tSCORE\tTRUST\tFIT\tRISK\tBLOCKED');
   ranked.forEach((entry) => {
     console.log(
-      `${entry.id}\t${entry.kind}\t${entry.rankScore.toFixed(1)}\t${entry.riskTier}(${entry.riskScore.toFixed(
-        0
-      )})\t${entry.blocked}`
+      `${entry.id}\t${entry.kind}\t${entry.provider}\t${entry.rankScore.toFixed(1)}\t${entry.scoreBreakdown.trustScore.toFixed(
+        1
+      )}\t${entry.scoreBreakdown.fitScore.toFixed(1)}\t${entry.riskTier}(${entry.riskScore.toFixed(0)})\t${entry.blocked}`
     );
   });
 }
@@ -71,12 +82,12 @@ async function handleAssess(args: string[]): Promise<void> {
     throw new Error('Missing --id for assess');
   }
 
-  const found = await loadCatalogById(id);
+  const found = await loadCatalogItemById(id);
   if (!found) {
     throw new Error(`Catalog item not found: ${id}`);
   }
 
-  const assessment = await assessRisk(found.item);
+  const assessment = await assessRisk(found);
   console.log(JSON.stringify(assessment, null, 2));
 }
 
@@ -101,7 +112,17 @@ async function handleWhitelist(args: string[]): Promise<void> {
   const allowFailures = hasFlag(args, '--allow-failures');
 
   const result = await verifyWhitelist();
-  console.log(JSON.stringify({ reportPath: result.reportPath, failed: result.report.failed.length }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        reportPath: result.reportPath,
+        failed: result.report.failed.length,
+        staleRegistries: result.report.staleRegistries
+      },
+      null,
+      2
+    )
+  );
   if (result.report.failed.length > 0 && !allowFailures) {
     throw new Error(`Whitelist verification failed (${result.report.failed.length} entries)`);
   }
@@ -134,10 +155,25 @@ function hasFlag(args: string[], flag: string): boolean {
   return args.includes(flag);
 }
 
+function readKinds(args: string[]): CatalogKind[] | undefined {
+  const value = readFlag(args, '--kind');
+  if (!value) {
+    return undefined;
+  }
+
+  return value
+    .split(',')
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 0)
+    .map((kind) => CatalogKindSchema.parse(kind));
+}
+
 function printHelp(): void {
   logger.info('Commands:');
-  logger.info('  sync');
-  logger.info('  recommend --project . --requirements requirements.yml --format json|table');
+  logger.info('  sync [--kind skill,mcp,claude-plugin,copilot-extension]');
+  logger.info(
+    '  recommend --project . --requirements requirements.yml --format json|table [--kind skill,mcp,claude-plugin,copilot-extension]'
+  );
   logger.info('  assess --id <catalog-id>');
   logger.info('  install --id <catalog-id> [--yes] [--override-risk]');
   logger.info('  whitelist verify');

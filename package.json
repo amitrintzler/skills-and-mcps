@@ -14,8 +14,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate:data": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/validate-data.ts",
-    "ingest:skills": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts",
-    "ingest:mcps": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts",
+    "ingest:skills": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts --kind skill",
+    "ingest:mcps": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts --kind mcp",
+    "ingest:claude-plugins": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts --kind claude-plugin",
+    "ingest:copilot-extensions": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts --kind copilot-extension",
     "ingest:all": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts",
     "sync": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts sync",
     "recommend": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts recommend",
@@ -25,8 +27,13 @@
     "quarantine:apply": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts quarantine apply"
   },
   "dependencies": {
+    "@remotion/cli": "^4.0.419",
+    "@types/react": "^19.2.13",
     "fs-extra": "^11.2.0",
     "globby": "^14.0.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.419",
     "zod": "^3.23.8"
   },
   "devDependencies": {

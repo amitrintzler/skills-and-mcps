@@ -1,0 +1,223 @@
+[
+  {
+    "id": "claude-plugin:workspace-ops",
+    "kind": "claude-plugin",
+    "name": "Workspace Ops",
+    "description": "Manage internal docs and tickets from Claude.",
+    "provider": "anthropic",
+    "capabilities": [
+      "tickets",
+      "docs",
+      "search"
+    ],
+    "compatibility": [
+      "claude",
+      "general"
+    ],
+    "source": "official-claude-plugins",
+    "lastSeenAt": "2026-02-10",
+    "install": {
+      "kind": "manual",
+      "instructions": "Enable from Claude plugin catalog."
+    },
+    "adoptionSignal": 58,
+    "maintenanceSignal": 72,
+    "provenanceSignal": 96,
+    "freshnessSignal": 68,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "copilot-extension:repo-security",
+    "kind": "copilot-extension",
+    "name": "Repo Security Insights",
+    "description": "Surface dependency, code scanning, and secret findings inside Copilot.",
+    "provider": "github",
+    "capabilities": [
+      "security",
+      "dependency-audit",
+      "code-scanning"
+    ],
+    "compatibility": [
+      "copilot",
+      "github",
+      "node",
+      "python"
+    ],
+    "source": "official-copilot-extensions",
+    "lastSeenAt": "2026-02-10",
+    "install": {
+      "kind": "gh-cli",
+      "target": "copilot-extension",
+      "args": [
+        "install",
+        "repo-security"
+      ]
+    },
+    "adoptionSignal": 64,
+    "maintenanceSignal": 75,
+    "provenanceSignal": 97,
+    "freshnessSignal": 72,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:filesystem",
+    "kind": "mcp",
+    "name": "Filesystem MCP Server",
+    "description": "Access local files in read/write mode.",
+    "provider": "mcp",
+    "capabilities": [
+      "file-read",
+      "file-write"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "container"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-10",
+    "transport": "stdio",
+    "authModel": "none",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-filesystem",
+      "args": [
+        "--transport",
+        "stdio"
+      ]
+    },
+    "adoptionSignal": 84,
+    "maintenanceSignal": 81,
+    "provenanceSignal": 95,
+    "freshnessSignal": 70,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 1,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:remote-browser",
+    "kind": "mcp",
+    "name": "Remote Browser MCP",
+    "description": "Remote browser automation via network transport.",
+    "provider": "mcp",
+    "capabilities": [
+      "browser-control",
+      "automation"
+    ],
+    "compatibility": [
+      "node"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-10",
+    "transport": "http",
+    "authModel": "api_key",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-remote-browser",
+      "args": [
+        "--transport",
+        "http"
+      ]
+    },
+    "adoptionSignal": 66,
+    "maintenanceSignal": 58,
+    "provenanceSignal": 88,
+    "freshnessSignal": 64,
+    "securitySignals": {
+      "knownVulnerabilities": 1,
+      "suspiciousPatterns": 2,
+      "injectionFindings": 1,
+      "exfiltrationSignals": 1,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "skill:fast-web-scrape",
+    "kind": "skill",
+    "name": "Fast Web Scrape",
+    "description": "High-throughput data extraction helpers for websites.",
+    "provider": "openai",
+    "capabilities": [
+      "scraping",
+      "automation"
+    ],
+    "compatibility": [
+      "node"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-10",
+    "install": {
+      "kind": "skill.sh",
+      "target": "fast-web-scrape",
+      "args": []
+    },
+    "adoptionSignal": 62,
+    "maintenanceSignal": 55,
+    "provenanceSignal": 40,
+    "freshnessSignal": 50,
+    "securitySignals": {
+      "knownVulnerabilities": 1,
+      "suspiciousPatterns": 1,
+      "injectionFindings": 1,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "skill:secure-prompting",
+    "kind": "skill",
+    "name": "Secure Prompting",
+    "description": "Prompt hardening patterns for high-safety agent workloads.",
+    "provider": "openai",
+    "capabilities": [
+      "prompting",
+      "security",
+      "guardrails"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "general"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-10",
+    "install": {
+      "kind": "skill.sh",
+      "target": "secure-prompting",
+      "args": []
+    },
+    "adoptionSignal": 78,
+    "maintenanceSignal": 83,
+    "provenanceSignal": 75,
+    "freshnessSignal": 60,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  }
+]

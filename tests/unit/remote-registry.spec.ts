@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveRegistryEntries } from '../../src/catalog/remote-registry.js';
+import { extractEntries, resolveRegistryEntries } from '../../src/catalog/remote-registry.js';
 import { RegistrySchema } from '../../src/lib/validation/contracts.js';
 
 describe('resolveRegistryEntries', () => {
@@ -112,5 +112,15 @@ describe('resolveRegistryEntries', () => {
 
     expect(result.entries).toEqual([{ id: 'skill:local' }]);
     expect(result.source).toBe('local');
+  });
+
+  it('resolves default key for plugin kinds in catalog-json format', () => {
+    const parsed = extractEntries(
+      { plugins: [{ id: 'claude-plugin:a' }] },
+      'catalog-json',
+      undefined,
+      'claude-plugin'
+    );
+    expect(parsed).toEqual([{ id: 'claude-plugin:a' }]);
   });
 });

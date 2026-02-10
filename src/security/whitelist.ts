@@ -3,21 +3,21 @@ import path from 'node:path';
 import fs from 'fs-extra';
 
 import { loadSecurityPolicy } from '../config/runtime.js';
-import { loadCatalogById, loadWhitelist, saveQuarantine, saveWhitelist } from '../catalog/repository.js';
+import { loadCatalogItemById, loadWhitelist, saveQuarantine, saveWhitelist } from '../catalog/repository.js';
+import { getStaleRegistries, loadSyncState } from '../catalog/sync-state.js';
 import { writeJsonFile, readJsonFile } from '../lib/json.js';
 import { logger } from '../lib/logger.js';
 import { SecurityReportSchema, type QuarantineEntry, type SecurityReport } from '../lib/validation/contracts.js';
 import { buildAssessment, isBlockedTier } from './assessment.js';
 
 export async function verifyWhitelist(): Promise<{ reportPath: string; report: SecurityReport }> {
-  const whitelist = await loadWhitelist();
-  const policy = await loadSecurityPolicy();
+  const [whitelist, policy, syncState] = await Promise.all([loadWhitelist(), loadSecurityPolicy(), loadSyncState()]);
 
   const passed: string[] = [];
   const failed: SecurityReport['failed'] = [];
 
   for (const id of whitelist) {
-    const record = await loadCatalogById(id);
+    const record = await loadCatalogItemById(id);
     if (!record) {
       failed.push({
         id,
@@ -28,7 +28,7 @@ export async function verifyWhitelist(): Promise<{ reportPath: string; report: S
       continue;
     }
 
-    const assessment = buildAssessment(record.item, policy);
+    const assessment = buildAssessment(record, policy);
 
     if (isBlockedTier(assessment.riskTier, policy)) {
       failed.push({
@@ -45,6 +45,7 @@ export async function verifyWhitelist(): Promise<{ reportPath: string; report: S
 
   const report = SecurityReportSchema.parse({
     generatedAt: new Date().toISOString(),
+    staleRegistries: getStaleRegistries(syncState),
     passed,
     failed
   });

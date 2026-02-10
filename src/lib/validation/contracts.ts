@@ -5,56 +5,65 @@ const isoDate = z
   .regex(/^(19|20|21)\d{2}-[01]\d-[0-3]\d$/, 'Expected ISO date (YYYY-MM-DD)');
 
 export const RiskTierSchema = z.enum(['low', 'medium', 'high', 'critical']);
+export const CatalogKindSchema = z.enum(['skill', 'mcp', 'claude-plugin', 'copilot-extension']);
 
-export const InstallMethodSchema = z.object({
-  kind: z.literal('skill.sh'),
-  target: z.string().min(1),
-  args: z.array(z.string()).default([])
-});
+const SecuritySignalsSchema = z
+  .object({
+    knownVulnerabilities: z.number().int().min(0).default(0),
+    suspiciousPatterns: z.number().int().min(0).default(0),
+    injectionFindings: z.number().int().min(0).default(0),
+    exfiltrationSignals: z.number().int().min(0).default(0),
+    integrityAlerts: z.number().int().min(0).default(0)
+  })
+  .default({});
 
-export const CatalogSkillSchema = z.object({
+export const InstallMethodSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('skill.sh'),
+    target: z.string().min(1),
+    args: z.array(z.string()).default([])
+  }),
+  z.object({
+    kind: z.literal('gh-cli'),
+    target: z.string().min(1),
+    args: z.array(z.string()).default([])
+  }),
+  z.object({
+    kind: z.literal('manual'),
+    instructions: z.string().min(1),
+    url: z.string().url().optional()
+  })
+]);
+
+export const CatalogItemSchema = z.object({
   id: z.string().min(1),
+  kind: CatalogKindSchema,
   name: z.string().min(1),
   description: z.string().min(1),
+  provider: z.string().min(1),
   capabilities: z.array(z.string().min(1)).default([]),
   compatibility: z.array(z.string().min(1)).default([]),
   source: z.string().min(1),
   lastSeenAt: isoDate,
+  transport: z.enum(['stdio', 'http', 'sse', 'websocket']).optional(),
+  authModel: z.enum(['none', 'api_key', 'oauth', 'custom']).optional(),
   install: InstallMethodSchema,
   adoptionSignal: z.number().min(0).max(100).default(50),
   maintenanceSignal: z.number().min(0).max(100).default(50),
-  securitySignals: z
-    .object({
-      knownVulnerabilities: z.number().int().min(0).default(0),
-      suspiciousPatterns: z.number().int().min(0).default(0),
-      injectionFindings: z.number().int().min(0).default(0),
-      exfiltrationSignals: z.number().int().min(0).default(0),
-      integrityAlerts: z.number().int().min(0).default(0)
-    })
-    .default({})
+  provenanceSignal: z.number().min(0).max(100).default(80),
+  freshnessSignal: z.number().min(0).max(100).default(50),
+  securitySignals: SecuritySignalsSchema,
+  metadata: z.record(z.unknown()).default({})
 });
 
-export const CatalogMcpServerSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  transport: z.enum(['stdio', 'http', 'sse', 'websocket']),
-  authModel: z.enum(['none', 'api_key', 'oauth', 'custom']),
-  capabilities: z.array(z.string().min(1)).default([]),
-  compatibility: z.array(z.string().min(1)).default([]),
-  source: z.string().min(1),
-  lastSeenAt: isoDate,
-  install: InstallMethodSchema,
-  adoptionSignal: z.number().min(0).max(100).default(50),
-  maintenanceSignal: z.number().min(0).max(100).default(50),
-  securitySignals: z
-    .object({
-      knownVulnerabilities: z.number().int().min(0).default(0),
-      suspiciousPatterns: z.number().int().min(0).default(0),
-      injectionFindings: z.number().int().min(0).default(0),
-      exfiltrationSignals: z.number().int().min(0).default(0),
-      integrityAlerts: z.number().int().min(0).default(0)
-    })
-    .default({})
+export const CatalogSkillSchema = CatalogItemSchema.extend({
+  kind: z.literal('skill')
+});
+
+export const CatalogMcpServerSchema = CatalogItemSchema.extend({
+  kind: z.literal('mcp'),
+  transport: z.enum(['stdio', 'http', 'sse', 'websocket']).default('stdio'),
+  authModel: z.enum(['none', 'api_key', 'oauth', 'custom']).default('none')
 });
 
 export const RiskAssessmentSchema = z.object({
@@ -74,13 +83,22 @@ export const RiskAssessmentSchema = z.object({
 
 export const RecommendationSchema = z.object({
   id: z.string().min(1),
-  kind: z.enum(['skill', 'mcp']),
+  kind: CatalogKindSchema,
+  provider: z.string().min(1),
   rankScore: z.number().min(0).max(100),
   fitReasons: z.array(z.string().min(1)).nonempty(),
+  scoreBreakdown: z.object({
+    fitScore: z.number().min(0).max(100),
+    trustScore: z.number().min(0).max(100),
+    securityPenalty: z.number().min(0).max(100),
+    freshnessBonus: z.number().min(0).max(100),
+    blockedPenalty: z.number().min(0).max(100)
+  }),
   riskTier: RiskTierSchema,
   riskScore: z.number().min(0).max(100),
   blocked: z.boolean(),
-  installMethod: z.literal('skill.sh')
+  blockReason: z.string().optional(),
+  installMethod: z.enum(['skill.sh', 'gh-cli', 'manual'])
 });
 
 export const InstallAuditSchema = z.object({
@@ -88,7 +106,7 @@ export const InstallAuditSchema = z.object({
   requestedAt: z.string().datetime(),
   policyDecision: z.enum(['allowed', 'blocked', 'override-allowed']),
   overrideUsed: z.boolean(),
-  installer: z.literal('skill.sh'),
+  installer: z.enum(['skill.sh', 'gh-cli', 'manual']),
   exitCode: z.number().int()
 });
 
@@ -109,15 +127,27 @@ export const RemoteRegistrySchema = z.object({
     .optional(),
   timeoutMs: z.number().int().min(100).max(120000).default(10000),
   authEnv: z.string().min(1).optional(),
-  fallbackToLocal: z.boolean().default(true)
+  fallbackToLocal: z.boolean().default(true),
+  provider: z.string().min(1).optional(),
+  official: z.boolean().default(true),
+  licenseHint: z.string().min(1).optional()
 });
 
 export const RegistrySchema = z.object({
   id: z.string().min(1),
-  kind: z.enum(['skill', 'mcp']),
+  kind: CatalogKindSchema,
   sourceType: z.enum(['public-index', 'vendor-feed', 'community-list']),
-  adapter: z.enum(['direct', 'mcp-registry-v0.1']).default('direct'),
+  adapter: z
+    .enum([
+      'direct',
+      'mcp-registry-v0.1',
+      'openai-skills-v1',
+      'claude-plugins-v0.1',
+      'copilot-extensions-v0.1'
+    ])
+    .default('direct'),
   enabled: z.boolean().default(true),
+  officialOnly: z.boolean().default(true),
   entries: z.array(z.unknown()).default([]),
   remote: RemoteRegistrySchema.optional()
 });
@@ -146,12 +176,43 @@ export const SecurityPolicySchema = z.object({
   })
 });
 
+export const RankingPolicySchema = z.object({
+  weights: z.object({
+    compatibility: z.number().min(0).max(100).default(25),
+    capabilityCoverage: z.number().min(0).max(100).default(20),
+    maintenance: z.number().min(0).max(100).default(18),
+    provenance: z.number().min(0).max(100).default(18),
+    adoption: z.number().min(0).max(100).default(12),
+    freshnessBonusMax: z.number().min(0).max(100).default(8),
+    securityPenaltyMax: z.number().min(0).max(100).default(40),
+    blockedPenalty: z.number().min(0).max(100).default(40)
+  }),
+  tieBreakers: z.array(z.enum(['trust', 'risk', 'name'])).default(['trust', 'risk', 'name']),
+  blockedFloorTier: RiskTierSchema.default('high')
+});
+
 export const RecommendationWeightsSchema = z.object({
   compatibility: z.number().min(0).max(100).default(40),
   capabilityCoverage: z.number().min(0).max(100).default(25),
   maintenance: z.number().min(0).max(100).default(15),
   adoption: z.number().min(0).max(100).default(10),
   securityPenaltyMax: z.number().min(0).max(100).default(30)
+});
+
+export const ProviderConfigSchema = z.object({
+  id: z.string().min(1),
+  enabled: z.boolean().default(true),
+  officialOnly: z.boolean().default(true),
+  trustLevel: z.enum(['high', 'medium', 'low']).default('high'),
+  authEnv: z.string().min(1).optional(),
+  poll: z.object({
+    mode: z.enum(['daily', 'manual', 'every-6h']).default('daily'),
+    rateLimitPerMinute: z.number().int().min(1).max(1000).default(60)
+  })
+});
+
+export const ProvidersFileSchema = z.object({
+  providers: z.array(ProviderConfigSchema)
 });
 
 export const RequirementsProfileSchema = z.object({
@@ -178,6 +239,7 @@ export const QuarantineFileSchema = z.object({
 
 export const SecurityReportSchema = z.object({
   generatedAt: z.string().datetime(),
+  staleRegistries: z.array(z.string().min(1)).default([]),
   passed: z.array(z.string()).default([]),
   failed: z
     .array(
@@ -191,6 +253,8 @@ export const SecurityReportSchema = z.object({
     .default([])
 });
 
+export type CatalogKind = z.infer<typeof CatalogKindSchema>;
+export type CatalogItem = z.infer<typeof CatalogItemSchema>;
 export type CatalogSkill = z.infer<typeof CatalogSkillSchema>;
 export type CatalogMcpServer = z.infer<typeof CatalogMcpServerSchema>;
 export type RiskTier = z.infer<typeof RiskTierSchema>;
@@ -200,7 +264,10 @@ export type InstallAudit = z.infer<typeof InstallAuditSchema>;
 export type Registry = z.infer<typeof RegistrySchema>;
 export type RemoteRegistryConfig = z.infer<typeof RemoteRegistrySchema>;
 export type SecurityPolicy = z.infer<typeof SecurityPolicySchema>;
+export type RankingPolicy = z.infer<typeof RankingPolicySchema>;
 export type RecommendationWeights = z.infer<typeof RecommendationWeightsSchema>;
+export type ProviderConfig = z.infer<typeof ProviderConfigSchema>;
 export type RequirementsProfile = z.infer<typeof RequirementsProfileSchema>;
 export type SecurityReport = z.infer<typeof SecurityReportSchema>;
 export type QuarantineEntry = z.infer<typeof QuarantineEntrySchema>;
+export type InstallMethod = z.infer<typeof InstallMethodSchema>;

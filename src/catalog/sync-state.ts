@@ -4,8 +4,13 @@ import { readJsonFile, writeJsonFile } from '../lib/json.js';
 
 const SYNC_STATE_PATH = 'data/catalog/sync-state.json';
 
+interface RegistrySyncState {
+  lastUpdatedSince?: string;
+  lastSuccessfulSyncAt?: string;
+}
+
 interface SyncStateFile {
-  registries: Record<string, { lastUpdatedSince?: string }>;
+  registries: Record<string, RegistrySyncState>;
 }
 
 const EMPTY_STATE: SyncStateFile = { registries: {} };
@@ -20,7 +25,7 @@ export async function loadSyncState(): Promise<SyncStateFile> {
     return EMPTY_STATE;
   }
 
-  const registries = (raw as { registries?: Record<string, { lastUpdatedSince?: string }> }).registries;
+  const registries = (raw as { registries?: Record<string, RegistrySyncState> }).registries;
   return { registries: registries ?? {} };
 }
 
@@ -42,4 +47,35 @@ export function setUpdatedSince(state: SyncStateFile, registryId: string, timest
       }
     }
   };
+}
+
+export function setSuccessfulSync(state: SyncStateFile, registryId: string, timestamp: string): SyncStateFile {
+  return {
+    registries: {
+      ...state.registries,
+      [registryId]: {
+        ...(state.registries[registryId] ?? {}),
+        lastSuccessfulSyncAt: timestamp
+      }
+    }
+  };
+}
+
+export function getStaleRegistries(
+  state: SyncStateFile,
+  now = new Date(),
+  staleAfterHours = 48
+): string[] {
+  const staleCutoffMs = now.getTime() - staleAfterHours * 60 * 60 * 1000;
+
+  return Object.entries(state.registries)
+    .filter(([, value]) => {
+      if (!value.lastSuccessfulSyncAt) {
+        return true;
+      }
+      const stamp = Date.parse(value.lastSuccessfulSyncAt);
+      return !Number.isFinite(stamp) || stamp < staleCutoffMs;
+    })
+    .map(([registryId]) => registryId)
+    .sort((a, b) => a.localeCompare(b));
 }

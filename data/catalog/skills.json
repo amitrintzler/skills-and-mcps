@@ -1,8 +1,10 @@
 [
   {
     "id": "skill:fast-web-scrape",
+    "kind": "skill",
     "name": "Fast Web Scrape",
     "description": "High-throughput data extraction helpers for websites.",
+    "provider": "openai",
     "capabilities": [
       "scraping",
       "automation"
@@ -11,7 +13,7 @@
       "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-06",
+    "lastSeenAt": "2026-02-10",
     "install": {
       "kind": "skill.sh",
       "target": "fast-web-scrape",
@@ -19,18 +21,23 @@
     },
     "adoptionSignal": 62,
     "maintenanceSignal": 55,
+    "provenanceSignal": 40,
+    "freshnessSignal": 50,
     "securitySignals": {
       "knownVulnerabilities": 1,
       "suspiciousPatterns": 1,
       "injectionFindings": 1,
       "exfiltrationSignals": 0,
       "integrityAlerts": 0
-    }
+    },
+    "metadata": {}
   },
   {
     "id": "skill:secure-prompting",
+    "kind": "skill",
     "name": "Secure Prompting",
     "description": "Prompt hardening patterns for high-safety agent workloads.",
+    "provider": "openai",
     "capabilities": [
       "prompting",
       "security",
@@ -42,7 +49,7 @@
       "general"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-06",
+    "lastSeenAt": "2026-02-10",
     "install": {
       "kind": "skill.sh",
       "target": "secure-prompting",
@@ -50,12 +57,15 @@
     },
     "adoptionSignal": 78,
     "maintenanceSignal": 83,
+    "provenanceSignal": 75,
+    "freshnessSignal": 60,
     "securitySignals": {
       "knownVulnerabilities": 0,
       "suspiciousPatterns": 0,
       "injectionFindings": 0,
       "exfiltrationSignals": 0,
       "integrityAlerts": 0
-    }
+    },
+    "metadata": {}
   }
 ]

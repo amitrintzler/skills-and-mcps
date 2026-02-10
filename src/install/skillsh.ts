@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 
 import { loadSecurityPolicy } from '../config/runtime.js';
-import { loadCatalogById } from '../catalog/repository.js';
+import { loadCatalogItemById } from '../catalog/repository.js';
 import { logger } from '../lib/logger.js';
 import { writeJsonFile } from '../lib/json.js';
 import { InstallAuditSchema, type InstallAudit } from '../lib/validation/contracts.js';
@@ -14,17 +14,13 @@ export interface InstallOptions {
 }
 
 export async function installWithSkillSh(options: InstallOptions): Promise<InstallAudit> {
-  const record = await loadCatalogById(options.id);
+  const record = await loadCatalogItemById(options.id);
   if (!record) {
     throw new Error(`Catalog entry not found: ${options.id}`);
   }
 
-  if (record.item.install.kind !== 'skill.sh') {
-    throw new Error(`No skill.sh installer mapping for ${options.id}`);
-  }
-
   const policy = await loadSecurityPolicy();
-  const assessment = buildAssessment(record.item, policy);
+  const assessment = buildAssessment(record, policy);
 
   if (isBlockedTier(assessment.riskTier, policy) && !options.overrideRisk) {
     await persistAudit({
@@ -32,7 +28,7 @@ export async function installWithSkillSh(options: InstallOptions): Promise<Insta
       requestedAt: new Date().toISOString(),
       policyDecision: 'blocked',
       overrideUsed: false,
-      installer: 'skill.sh',
+      installer: record.install.kind,
       exitCode: 1
     });
 
@@ -45,17 +41,34 @@ export async function installWithSkillSh(options: InstallOptions): Promise<Insta
     logger.warn(`Security warning for ${options.id}: ${assessment.riskTier} (${assessment.riskScore})`);
   }
 
-  const commandArgs = buildSkillShInstallArgs(record.item.install.target, record.item.install.args, options.yes);
-  const exitCode = await executeSkillSh(commandArgs);
+  const exitCode = await executeInstall(record.install, options.yes);
 
   return persistAudit({
     id: options.id,
     requestedAt: new Date().toISOString(),
     policyDecision: options.overrideRisk ? 'override-allowed' : 'allowed',
     overrideUsed: options.overrideRisk,
-    installer: 'skill.sh',
+    installer: record.install.kind,
     exitCode
   });
+}
+
+async function executeInstall(
+  install: { kind: 'skill.sh'; target: string; args: string[] } | { kind: 'gh-cli'; target: string; args: string[] } | { kind: 'manual'; instructions: string; url?: string },
+  yes: boolean
+): Promise<number> {
+  if (install.kind === 'manual') {
+    logger.info(`Manual install required: ${install.instructions}${install.url ? ` (${install.url})` : ''}`);
+    return 0;
+  }
+
+  if (install.kind === 'skill.sh') {
+    const commandArgs = buildSkillShInstallArgs(install.target, install.args, yes);
+    return executeCommand('skill.sh', commandArgs, 'skill.sh');
+  }
+
+  const commandArgs = buildGhInstallArgs(install.target, install.args, yes);
+  return executeCommand('gh', commandArgs, 'gh');
 }
 
 export function buildSkillShInstallArgs(target: string, args: string[], yes: boolean): string[] {
@@ -66,19 +79,30 @@ export function buildSkillShInstallArgs(target: string, args: string[], yes: boo
   return commandArgs;
 }
 
-async function executeSkillSh(args: string[]): Promise<number> {
+export function buildGhInstallArgs(target: string, args: string[], yes: boolean): string[] {
+  const commandArgs = [...args];
+  if (commandArgs.length === 0) {
+    commandArgs.push(target);
+  }
+  if (yes) {
+    commandArgs.push('--yes');
+  }
+  return commandArgs;
+}
+
+async function executeCommand(binary: string, args: string[], label: string): Promise<number> {
   if (process.env.SKILLS_MCPS_INSTALL_DRY_RUN === '1') {
-    logger.info(`Dry-run skill.sh ${args.join(' ')}`);
+    logger.info(`Dry-run ${label} ${args.join(' ')}`);
     return 0;
   }
 
   return new Promise<number>((resolve, reject) => {
-    const child = spawn('skill.sh', args, {
+    const child = spawn(binary, args, {
       stdio: 'inherit'
     });
 
     child.on('error', (error) => {
-      reject(new Error(`Failed to execute skill.sh: ${error.message}`));
+      reject(new Error(`Failed to execute ${label}: ${error.message}`));
     });
 
     child.on('close', (code) => {

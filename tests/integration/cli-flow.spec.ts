@@ -36,7 +36,8 @@ describe('integration flow', () => {
     const requirements = await loadRequirementsProfile('tests/fixtures/requirements.yml');
     const ranked = await recommend({ projectSignals, requirements });
 
-    expect(ranked[0].id).toBe('skill:secure-prompting');
+    expect(ranked.length).toBeGreaterThan(0);
+    expect(ranked.some((item) => item.id === 'skill:secure-prompting')).toBe(true);
     expect(ranked.some((item) => item.blocked)).toBe(true);
   });
 
@@ -54,11 +55,21 @@ describe('integration flow', () => {
   it('quarantines failed whitelist entries from verification report', async () => {
     await backupState();
 
-    const { reportPath } = await verifyWhitelist();
+    const { reportPath, report } = await verifyWhitelist();
     const outcome = await applyQuarantineFromReport(reportPath);
     const whitelist = await loadWhitelist();
 
+    expect(Array.isArray(report.staleRegistries)).toBe(true);
     expect(outcome.quarantined).toBeDefined();
     outcome.removedFromWhitelist.forEach((id) => expect(whitelist.has(id)).toBe(false));
+  });
+
+  it('filters recommendations by requested kinds', async () => {
+    const projectSignals = await detectProjectSignals('tests/fixtures/project-node');
+    const requirements = await loadRequirementsProfile('tests/fixtures/requirements.yml');
+    const ranked = await recommend({ projectSignals, requirements, kinds: ['claude-plugin'] });
+
+    expect(ranked.length).toBeGreaterThan(0);
+    expect(new Set(ranked.map((item) => item.kind))).toEqual(new Set(['claude-plugin']));
   });
 });

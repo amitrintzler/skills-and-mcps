@@ -1,12 +1,20 @@
-# Skills + MCP Security Intelligence Framework
+# Skills + MCP + Plugin Security Intelligence Framework
 
-CLI-first open-source framework for discovering public skills and Model Context Protocol (MCP) servers, generating project-aware recommendations, and installing safely through `skill.sh`.
+CLI-first open-source framework for discovering public skills, Model Context Protocol (MCP) servers, Claude Plugins, and Copilot Extensions; generating project-aware recommendations; and installing safely with policy-aware installers.
+
+## Why Choose This Framework?
+Unlike simple lists or static registries, this framework provides an active intelligence layer for your development workflow:
+
+1.  **Security-First**: We don't just list tools; we score them. High-risk items are blocked by default, and a daily CI process automatically quarantines unsafe entries.
+2.  **Context-Aware**: Recommendations are tailored to your specific project. The CLI analyzes your `package.json` and file structure to suggest skills that actually help.
+3.  **Centralized Hub**: Stop searching scattered GitHub repositories. We sync multiple registries into one queryable local catalog.
+4.  **Safe Installation**: The `install` command wraps `skill.sh` with policy checks, ensuring you never accidentally install a compromised or low-quality tool.
 
 ## Remotion Explainer Video
 Use this structure to produce a high-impact 90-second Remotion video for the GitHub page.
 
 ### Video Goal
-Show why this framework is the fastest and safest way to discover, evaluate, and install skills/MCP servers.
+Show why this framework is the fastest and safest way to discover, evaluate, and install skills, MCP servers, and plugins.
 
 ### Storyboard (90 seconds)
 1. Problem (0-12s)
@@ -35,20 +43,20 @@ Show why this framework is the fastest and safest way to discover, evaluate, and
 - Call to action: `npm run sync` then `npm run dev -- recommend --project .`
 
 ### Voiceover Script
-“Finding the right skills and MCP servers is slow, fragmented, and often risky.  
-This framework gives you one trusted pipeline: sync the latest catalog, get recommendations based on your real project and requirements, assess risk with clear scoring, then install through skill.sh with minimal effort.  
+“Finding the right skills, MCP servers, and plugins is slow, fragmented, and often risky.  
+This framework gives you one trusted pipeline: sync the latest catalog, get recommendations based on your real project and requirements, assess risk with clear scoring, then install through supported installers with minimal effort.  
 Security is built in. High-risk entries are blocked by default, and daily CI continuously revalidates the whitelist, quarantining unsafe entries automatically.  
 The result is simple: faster decisions, safer installs, and better outcomes for every team using MCP and skills in production.”
 
 ## What This Project Does
 - Syncs latest public catalog data from configured registries.
-- Recommends the best skills/MCP servers from project manifests + requirements profile.
+- Recommends the best skills, MCP servers, Claude Plugins, and Copilot Extensions from project manifests + requirements profile.
 - Enforces risk-aware installs with tiered security policy.
 - Verifies a whitelist daily and auto-quarantines unsafe entries.
 
 ## Core Commands
 - `npm run sync`
-- `npm run dev -- recommend --project . --requirements requirements.yml --format json`
+- `npm run dev -- recommend --project . --requirements requirements.yml --format json --kind skill,mcp,claude-plugin,copilot-extension`
 - `npm run dev -- assess --id mcp:filesystem`
 - `npm run dev -- install --id mcp:filesystem --yes`
 - `npm run whitelist:verify`
@@ -58,6 +66,30 @@ The result is simple: faster decisions, safer installs, and better outcomes for 
 1. `npm install`
 2. `npm run sync`
 3. `npm run dev -- recommend --project . --format table`
+## Quick Start Guide
+
+1.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+
+2.  **Sync the Catalog**:
+    Pull the latest items from configured provider registries.
+    ```bash
+    npm run sync
+    ```
+
+3.  **Get Recommendations**:
+    Analyze your current project and get a table of suggested tools.
+    ```bash
+    npm run dev -- recommend --project . --format table
+    ```
+
+4.  **Install a Tool**:
+    Safely install a specific MCP server (e.g., filesystem).
+    ```bash
+    npm run dev -- install --id mcp:filesystem --yes
+    ```
 
 ## Risk Tiers
 | Tier | Score | Default Install Policy |
@@ -71,8 +103,9 @@ Use `--override-risk` to bypass default block rules. Every install writes an aud
 
 ## Configuration
 - `config/registries.json`: discovery/crawl source inputs.
+- `config/providers.json`: provider policy (enabled, official-only, poll mode, auth env).
 - `config/security-policy.json`: scoring and block/warn gates.
-- `config/recommendation-weights.json`: ranking weights.
+- `config/ranking-policy.json`: trust-first ranking weights and penalties.
 
 ### Remote Registry Ingestion
 Each registry can optionally define:
@@ -92,8 +125,7 @@ Incremental state is persisted in `data/catalog/sync-state.json`.
 
 ## Data Contracts
 Catalog and runtime data are validated with Zod:
-- `CatalogSkill`
-- `CatalogMcpServer`
+- `CatalogItem` (unified)
 - `RiskAssessment`
 - `Recommendation`
 - `InstallAudit`
@@ -104,6 +136,11 @@ Workflow: `.github/workflows/daily-security.yml`
 - Verify whitelist against risk policy
 - Apply quarantine from report
 - Open/update PR with whitelist/quarantine diffs
+
+Catalog refresh workflow: `.github/workflows/catalog-sync.yml`
+- Scheduled daily sync + manual dispatch
+- Lint/test/build/verify gates
+- Commits catalog updates when data changed
 
 ## Backward Compatibility
 Legacy commands are preserved as shims:

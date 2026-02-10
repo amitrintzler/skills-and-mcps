@@ -1,21 +1,18 @@
 import { loadSecurityPolicy } from '../config/runtime.js';
 import {
   RiskAssessmentSchema,
-  type CatalogMcpServer,
-  type CatalogSkill,
+  type CatalogItem,
   type RiskAssessment,
   type RiskTier,
   type SecurityPolicy
 } from '../lib/validation/contracts.js';
 
-type CatalogRecord = CatalogSkill | CatalogMcpServer;
-
-export async function assessRisk(record: CatalogRecord): Promise<RiskAssessment> {
+export async function assessRisk(record: CatalogItem): Promise<RiskAssessment> {
   const policy = await loadSecurityPolicy();
   return buildAssessment(record, policy);
 }
 
-export function buildAssessment(record: CatalogRecord, policy: SecurityPolicy): RiskAssessment {
+export function buildAssessment(record: CatalogItem, policy: SecurityPolicy): RiskAssessment {
   const signals = record.securitySignals;
   const scoring = policy.scoring;
 
