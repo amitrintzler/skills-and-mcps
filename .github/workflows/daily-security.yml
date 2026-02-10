@@ -5,9 +5,17 @@ on:
     - cron: '12 3 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-security-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   daily-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: write
       pull-requests: write
@@ -22,7 +30,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Sync latest catalog
         run: npm run sync
@@ -33,7 +41,24 @@ jobs:
       - name: Apply quarantine from latest report
         run: |
           REPORT=$(ls -1t data/security-reports/*/report.json | head -n 1)
+          echo "Latest report: $REPORT"
           npm run quarantine:apply -- --report "$REPORT"
+
+      - name: Daily security summary
+        run: |
+          REPORT=$(ls -1t data/security-reports/*/report.json | head -n 1)
+          node -e '
+            const fs=require("fs");
+            const report=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));
+            const lines=[
+              "## Daily Security Summary",
+              `- Report: ${process.argv[1]}`,
+              `- Passed whitelist entries: ${report.passed.length}`,
+              `- Failed whitelist entries: ${report.failed.length}`,
+              `- Stale registries: ${report.staleRegistries?.length ?? 0}`
+            ];
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\\n") + "\\n");
+          ' "$REPORT"
 
       - name: Create quarantine PR
         uses: peter-evans/create-pull-request@v6
@@ -46,4 +71,5 @@ jobs:
             - Re-ran whitelist risk/injection checks
             - Applied quarantine for failing entries
           branch: chore/daily-security-quarantine
+          base: main
           delete-branch: true

@@ -20,6 +20,8 @@
     "ingest:copilot-extensions": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts --kind copilot-extension",
     "ingest:all": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts",
     "sync": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts sync",
+    "about": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts about",
+    "status": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts status",
     "recommend": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts recommend",
     "assess": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts assess",
     "install:item": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts install",

@@ -1,7 +1,9 @@
 import path from 'node:path';
+import fs from 'node:fs/promises';
 
 import { syncCatalogs } from '../../catalog/sync.js';
-import { loadCatalogItemById } from '../../catalog/repository.js';
+import { getStaleRegistries, loadSyncState } from '../../catalog/sync-state.js';
+import { loadCatalogItemById, loadCatalogItems, loadQuarantine, loadWhitelist } from '../../catalog/repository.js';
 import { installWithSkillSh } from '../../install/skillsh.js';
 import { logger } from '../../lib/logger.js';
 import { CatalogKindSchema, type CatalogKind } from '../../lib/validation/contracts.js';
@@ -15,6 +17,12 @@ export async function runCli(argv: string[]): Promise<void> {
   const [command = 'help', ...rest] = argv;
 
   switch (command) {
+    case 'about':
+      await handleAbout();
+      return;
+    case 'status':
+      await handleStatus();
+      return;
     case 'sync':
       await handleSync(rest);
       return;
@@ -37,6 +45,52 @@ export async function runCli(argv: string[]): Promise<void> {
     default:
       printHelp();
   }
+}
+
+async function handleAbout(): Promise<void> {
+  const packageRaw = await fs.readFile(path.resolve('package.json'), 'utf8');
+  const pkg = JSON.parse(packageRaw) as { name?: string; version?: string; description?: string };
+
+  console.log(`${pkg.name ?? 'skills-and-mcps'} v${pkg.version ?? '0.0.0'}`);
+  if (pkg.description) {
+    console.log(pkg.description);
+  }
+  console.log('Scope: skills, MCP servers, Claude plugins, Copilot extensions');
+  console.log('Ranking: trust-first (fit + trust - risk penalties + freshness bonus)');
+  console.log('Sources: official-first provider registries with local fallback');
+}
+
+async function handleStatus(): Promise<void> {
+  const [items, whitelist, quarantine, syncState] = await Promise.all([
+    loadCatalogItems(),
+    loadWhitelist(),
+    loadQuarantine(),
+    loadSyncState()
+  ]);
+
+  const kindCounts = new Map<string, number>();
+  const providerCounts = new Map<string, number>();
+  items.forEach((item) => {
+    kindCounts.set(item.kind, (kindCounts.get(item.kind) ?? 0) + 1);
+    providerCounts.set(item.provider, (providerCounts.get(item.provider) ?? 0) + 1);
+  });
+
+  console.log('Catalog Status');
+  console.log(`Items: ${items.length}`);
+  console.log(
+    `Kinds: skill=${kindCounts.get('skill') ?? 0}, mcp=${kindCounts.get('mcp') ?? 0}, claude-plugin=${kindCounts.get('claude-plugin') ?? 0}, copilot-extension=${kindCounts.get('copilot-extension') ?? 0}`
+  );
+  console.log(
+    `Providers: ${Array.from(providerCounts.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, count]) => `${name}=${count}`)
+      .join(', ')}`
+  );
+  console.log(`Whitelist approved: ${whitelist.size}`);
+  console.log(`Quarantined: ${quarantine.length}`);
+
+  const stale = getStaleRegistries(syncState);
+  console.log(`Stale registries (>48h): ${stale.length === 0 ? 'none' : stale.join(', ')}`);
 }
 
 async function handleSync(args: string[]): Promise<void> {
@@ -170,6 +224,8 @@ function readKinds(args: string[]): CatalogKind[] | undefined {
 
 function printHelp(): void {
   logger.info('Commands:');
+  logger.info('  about');
+  logger.info('  status');
   logger.info('  sync [--kind skill,mcp,claude-plugin,copilot-extension]');
   logger.info(
     '  recommend --project . --requirements requirements.yml --format json|table [--kind skill,mcp,claude-plugin,copilot-extension]'

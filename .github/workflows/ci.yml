@@ -2,30 +2,122 @@ name: CI
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["main"]
   pull_request:
-    branches: ["main", "master"]
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  compatibility:
+    name: Compatibility (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: compatibility
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+
       - name: Install dependencies
-        run: npm install
-      - name: Lint
-        run: npm run lint
-      - name: Test
-        run: npm run test
+        run: npm ci
+
       - name: Validate whitelist + policy
         run: npm run whitelist:verify
+
       - name: Ensure sync reproducibility
         run: |
           SKILLS_MCPS_SYNC_OFFLINE=1 npm run sync
           git diff --exit-code data/catalog
+
+      - name: Workflow summary
+        run: |
+          {
+            echo "## CI Summary"
+            echo "- Lint/Test/Build: passed on Node 18 and 20"
+            echo "- Policy verification: passed"
+            echo "- Offline sync reproducibility: passed"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  release-readiness:
+    name: Release Readiness (Advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate package version is semver
+        run: |
+          node -e 'const v=require("./package.json").version; if(!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$/.test(v)){console.error(`Invalid semver version: ${v}`); process.exit(1)}; console.log(`Valid semver version: ${v}`)'
+
+      - name: Conventional commit style check (warning only)
+        shell: bash
+        run: |
+          set +e
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            RANGE="origin/${{ github.base_ref }}..HEAD"
+            git fetch origin "${{ github.base_ref }}" --depth=200
+          else
+            RANGE="HEAD~20..HEAD"
+          fi
+
+          BAD=$(git log --pretty=format:'%s' $RANGE | grep -Ev '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+' || true)
+          if [ -n "$BAD" ]; then
+            echo "::warning::Non-conventional commit messages detected (advisory)."
+            echo "$BAD"
+          fi
+
+      - name: Workflow summary
+        run: |
+          {
+            echo "## Release Readiness (Advisory)"
+            echo "- Semver validation: checked"
+            echo "- Conventional commit style: warning-only"
+          } >> "$GITHUB_STEP_SUMMARY"

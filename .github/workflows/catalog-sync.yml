@@ -5,9 +5,17 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-sync-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: write
 
@@ -22,7 +30,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Sync catalog
         run: npm run sync
@@ -33,6 +41,23 @@ jobs:
           npm run test
           npm run build
           npm run whitelist:verify -- --allow-failures
+
+      - name: Catalog summary
+        run: |
+          node -e '
+            const fs=require("fs");
+            const items=JSON.parse(fs.readFileSync("data/catalog/items.json","utf8"));
+            const byKind=items.reduce((acc,item)=>{acc[item.kind]=(acc[item.kind]||0)+1;return acc;},{});
+            const lines=[
+              "## Catalog Sync Summary",
+              `- Items: ${items.length}`,
+              `- Skills: ${byKind["skill"]||0}`,
+              `- MCPs: ${byKind["mcp"]||0}`,
+              `- Claude plugins: ${byKind["claude-plugin"]||0}`,
+              `- Copilot extensions: ${byKind["copilot-extension"]||0}`
+            ];
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\\n") + "\\n");
+          '
 
       - name: Commit updated catalog artifacts
         run: |
