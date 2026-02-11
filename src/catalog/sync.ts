@@ -25,6 +25,7 @@ export async function syncCatalogs(
   items: CatalogItem[];
   staleRegistries: string[];
 }> {
+  const effectiveToday = process.env.SKILLS_MCPS_SYNC_TODAY || today;
   const [registries, providers] = await Promise.all([loadRegistries(), loadProviders()]);
   let syncState = await loadSyncState();
 
@@ -49,7 +50,7 @@ export async function syncCatalogs(
     const resolved = await resolveRegistryEntries(registry, { updatedSince });
     const adaptedEntries = resolved.source === 'remote' ? adaptRegistryEntries(registry, resolved.entries) : resolved.entries;
 
-    allItems.push(...normalizeItems(adaptedEntries, registry, today));
+    allItems.push(...normalizeItems(adaptedEntries, registry, effectiveToday));
 
     const nowStamp = new Date().toISOString();
     syncState = setSuccessfulSync(syncState, registry.id, nowStamp);

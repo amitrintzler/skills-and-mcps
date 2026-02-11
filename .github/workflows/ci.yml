@@ -69,7 +69,8 @@ jobs:
 
       - name: Ensure sync reproducibility
         run: |
-          SKILLS_MCPS_SYNC_OFFLINE=1 npm run sync
+          SYNC_TODAY=$(node -e 'const fs=require("fs");const p="data/catalog/items.json";if(!fs.existsSync(p)){console.log(new Date().toISOString().slice(0,10));process.exit(0)};const items=JSON.parse(fs.readFileSync(p,"utf8"));const latest=items.map(i=>i.lastSeenAt).filter(Boolean).sort().at(-1);console.log(latest||new Date().toISOString().slice(0,10));')
+          SKILLS_MCPS_SYNC_OFFLINE=1 SKILLS_MCPS_SYNC_TODAY="$SYNC_TODAY" npm run sync
           git diff --exit-code -- data/catalog/items.json data/catalog/skills.json data/catalog/mcps.json
 
       - name: Workflow summary
