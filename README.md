@@ -2,17 +2,17 @@
 
 <p align="center">
   <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml/badge.svg?branch=main" /></a>
-  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml"><img alt="Catalog Sync" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml/badge.svg?event=schedule" /></a>
-  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml"><img alt="Daily Security" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml/badge.svg?event=schedule" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml"><img alt="Daily Security" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml/badge.svg?branch=main" /></a>
   <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml"><img alt="Security / CodeQL" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml/badge.svg?branch=main" /></a>
-  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml"><img alt="Security / Dependency Review" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml/badge.svg?event=pull_request" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml"><img alt="Catalog Sync (Scheduled)" src="https://img.shields.io/badge/catalog%20sync-scheduled-0ea5e9" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml"><img alt="Dependency Review (PR)" src="https://img.shields.io/badge/dependency%20review-PR%20only-2563eb" /></a>
   <a href="https://nodejs.org/"><img alt="Node >=18.17" src="https://img.shields.io/badge/node-%3E%3D18.17-339933?logo=node.js&logoColor=white" /></a>
 </p>
 
 <p align="center">
   <sub>
-    Note: <strong>Dependency Review</strong> is PR-triggered, and <strong>Catalog Sync</strong> is scheduled/manual.
-    These two badges may show <em>no status</em> until they run on <code>main</code>.
+    Gatekeeping checks tracked as pass/fail: <strong>CI</strong>, <strong>Daily Security</strong>, and <strong>Security / CodeQL</strong>.
+    Catalog Sync and Dependency Review are still enabled and linked above.
   </sub>
 </p>
 
