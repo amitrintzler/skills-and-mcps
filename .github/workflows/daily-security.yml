@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -61,6 +63,8 @@ jobs:
           ' "$REPORT"
 
       - name: Create quarantine PR
+        id: create_pr
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "chore(security): daily quarantine update"
@@ -73,3 +77,12 @@ jobs:
           branch: chore/daily-security-quarantine
           base: main
           delete-branch: true
+
+      - name: Quarantine PR status
+        if: always()
+        run: |
+          {
+            echo "## Quarantine PR Step"
+            echo "- Outcome: ${{ steps.create_pr.outcome }}"
+            echo "- Note: If this is \`failure\`, enable 'Allow GitHub Actions to create and approve pull requests' in repo settings."
+          } >> "$GITHUB_STEP_SUMMARY"

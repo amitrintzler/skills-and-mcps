@@ -1,90 +1,306 @@
-# Skills + MCP + Plugin Security Intelligence Framework
+<h1 align="center">Skills + MCP + Plugin Security Intelligence Framework</h1>
 
-[![CI](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml/badge.svg)](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml)
-[![Catalog Sync](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml/badge.svg)](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml)
-[![Daily Security](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml/badge.svg)](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml)
-[![CodeQL](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml/badge.svg)](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml)
-[![Dependency Review](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml/badge.svg)](https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml)
-[![Node Version](https://img.shields.io/badge/node-%3E%3D18.17-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+<p align="center">
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml/badge.svg?branch=main" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml"><img alt="Catalog Sync" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml/badge.svg?branch=main" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml"><img alt="Daily Security" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml/badge.svg?branch=main" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml"><img alt="Security / CodeQL" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml/badge.svg?branch=main" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml"><img alt="Security / Dependency Review" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml/badge.svg?branch=main" /></a>
+  <a href="https://nodejs.org/"><img alt="Node >=18.17" src="https://img.shields.io/badge/node-%3E%3D18.17-339933?logo=node.js&logoColor=white" /></a>
+</p>
 
-A CLI-first intelligence layer for discovering, ranking, and safely installing:
-- Skills
-- MCP servers
-- Claude plugins
-- Copilot extensions
+<p align="center">
+  A production-grade CLI framework to discover, rank, validate, and safely install <strong>Skills</strong>,
+  <strong>MCP servers</strong>, <strong>Claude plugins</strong>, and <strong>Copilot extensions</strong>.
+</p>
 
-The project combines catalog freshness, project-fit ranking, and strict security policy gates in one workflow.
+<p align="center">
+  Live workflow runs and health details are available in the
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions">GitHub Actions dashboard</a>.
+</p>
 
-## Why This Project
+<p align="center">
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#full-cli-capability-map">CLI Map</a> •
+  <a href="#end-to-end-use-cases-with-screenshots">Use Cases</a> •
+  <a href="#full-remotion-walkthrough-video">Video Walkthrough</a> •
+  <a href="#ci-and-security-gates">Security</a>
+</p>
 
-Most teams currently use fragmented registries and manual trust checks. This framework gives you one source of truth with operational guardrails.
+---
 
-| Capability | What it gives you |
+## Why this framework
+
+| Capability | Outcome |
 | --- | --- |
-| Unified Catalog | One normalized catalog across multiple ecosystems |
-| Trust-First Ranking | Fit + trust signals, minus security penalties |
-| Safe Installation | Block/warn policy enforcement before install |
-| Continuous Validation | CI and scheduled scans keep catalog and policy aligned |
-| Auditability | Security reports, quarantines, and install audit records |
+| Unified Catalog | One normalized inventory across all supported ecosystems |
+| Trust-First Ranking | Better defaults using fit + trust - risk penalties |
+| Policy-Gated Installs | High-risk items blocked by default |
+| Continuous Verification | Daily whitelist validation and quarantine automation |
+| Rich CLI UX | Guided onboarding, diagnostics, discovery, and export |
+| CI Security Controls | CodeQL, dependency review, secrets scan, SBOM + Trivy |
 
-## How It Works
+## Visual architecture
 
-```text
-Provider Registries -> Sync + Normalize -> Unified Catalog (data/catalog/items.json)
-      -> Recommend (fit + trust + risk)
-      -> Assess
-      -> Install (policy-aware)
-      -> Daily verify/quarantine automation
+```mermaid
+flowchart LR
+  %% SOURCE LAYER
+  subgraph S["Source Layer"]
+    R1["Official Provider Feeds"]
+    R2["Community Sources (Opt-in)"]
+    R3["Local Fallback Entries"]
+  end
+
+  %% INGESTION + INTELLIGENCE LAYER
+  subgraph I["Ingestion + Intelligence Layer"]
+    I1["Remote Fetch + Incremental Cursor"]
+    I2["Adapter Mapping (provider-specific)"]
+    I3["Schema Validation (Zod)"]
+    I4["Normalization + Merge (deterministic)"]
+    I5["Unified Catalog Store\n(data/catalog/items.json)"]
+    I6["Trust-First Ranking Engine"]
+    I7["Risk Assessment Engine"]
+  end
+
+  %% POLICY + GOVERNANCE LAYER
+  subgraph G["Policy + Governance Layer"]
+    G1["Security Policy Gates\n(low/medium/high/critical)"]
+    G2["Whitelist Verification"]
+    G3["Quarantine State"]
+    G4["Install Audit Logs"]
+  end
+
+  %% USER EXPERIENCE LAYER
+  subgraph U["CLI Experience Layer"]
+    U1["Init + Doctor"]
+    U2["List / Search / Show / Top"]
+    U3["Recommend + Export (table/json/csv/md)"]
+    U4["Assess + Install"]
+    U5["Status + Sync"]
+  end
+
+  %% CI / CONTINUOUS TRUST LAYER
+  subgraph C["Continuous Trust (GitHub Actions)"]
+    C1["CI (lint/test/build/reproducibility)"]
+    C2["CodeQL / Dependency Review / Secrets / Trivy+SBOM"]
+    C3["Daily Security + Quarantine PR"]
+    C4["Daily Catalog Sync"]
+  end
+
+  R1 --> I1
+  R2 --> I1
+  R3 --> I4
+
+  I1 --> I2 --> I3 --> I4 --> I5
+  I5 --> I6
+  I5 --> I7
+
+  I6 --> U3
+  I7 --> U4
+  I5 --> U2
+  I5 --> U5
+  U1 --> U5
+
+  I7 --> G1
+  G1 --> U4
+  G1 --> G2
+  G2 --> G3
+  U4 --> G4
+  G3 --> I5
+
+  C1 --> I5
+  C2 --> G1
+  C3 --> G3
+  C4 --> I5
+
+  classDef source fill:#0f172a,stroke:#38bdf8,color:#e2e8f0,stroke-width:1px;
+  classDef engine fill:#0b1a14,stroke:#22c55e,color:#dcfce7,stroke-width:1px;
+  classDef policy fill:#1f1313,stroke:#ef4444,color:#fee2e2,stroke-width:1px;
+  classDef ux fill:#1a1633,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+  classDef ci fill:#1a2230,stroke:#f59e0b,color:#fef3c7,stroke-width:1px;
+
+  class R1,R2,R3 source;
+  class I1,I2,I3,I4,I5,I6,I7 engine;
+  class G1,G2,G3,G4 policy;
+  class U1,U2,U3,U4,U5 ux;
+  class C1,C2,C3,C4 ci;
 ```
+
+---
 
 ## Quick Start
 
-1. Install dependencies
 ```bash
 npm install
-```
-
-2. Sync all enabled catalog sources
-```bash
+npm run init
+npm run doctor
 npm run sync
+npm run top -- --limit 5
 ```
 
-3. Inspect live health
-```bash
-npm run status
-```
-
-4. Get recommendations for your project
-```bash
-npm run dev -- recommend --project . --format table
-```
-
-5. Install an item with policy checks
-```bash
-npm run dev -- install --id mcp:filesystem --yes
-```
-
-## CLI Commands
-
-| Command | Purpose |
-| --- | --- |
-| `npm run about` | Show project identity, scope, and ranking model |
-| `npm run status` | Show catalog totals, provider mix, whitelist/quarantine, stale registries |
-| `npm run sync` | Refresh catalog from enabled registries |
-| `npm run dev -- recommend ...` | Rank items by project fit + trust/risk model |
-| `npm run dev -- assess --id <id>` | Show detailed risk assessment |
-| `npm run dev -- install --id <id> [--yes] [--override-risk]` | Policy-aware install |
-| `npm run whitelist:verify` | Verify approved items against current risk policy |
-| `npm run quarantine:apply -- --report <path>` | Apply quarantine from a report |
-
-### Recommend examples
+For current project recommendations:
 
 ```bash
-npm run dev -- recommend --project . --format table
-npm run dev -- recommend --project . --format json --kind skill,mcp,claude-plugin,copilot-extension
+npm run dev -- recommend --project . --only-safe --sort trust --limit 10
 ```
 
-## Risk Model
+---
+
+## Full CLI Capability Map
+
+### Core operations
+- `npm run about`
+- `npm run status [-- --verbose]`
+- `npm run sync [-- --kind skill,mcp,claude-plugin,copilot-extension] [-- --dry-run]`
+
+### Guided setup and diagnostics
+- `npm run init [-- --project .]`
+- `npm run doctor [-- --project .]`
+
+### Catalog discovery and inspection
+- `npm run list -- --kind mcp --limit 10`
+- `npm run search -- security`
+- `npm run show -- --id mcp:filesystem`
+- `npm run top -- --project . --limit 5`
+
+### Recommendation and export
+- `npm run dev -- recommend --project . --format table`
+- `npm run dev -- recommend --project . --only-safe --sort trust --limit 10`
+- `npm run dev -- recommend --project . --export csv --out recommendations.csv`
+- `npm run dev -- recommend --project . --export md --out recommendations.md`
+
+### Risk and installation controls
+- `npm run dev -- assess --id mcp:remote-browser`
+- `npm run dev -- install --id mcp:filesystem --yes`
+- `npm run dev -- install --id mcp:remote-browser --yes --override-risk`
+
+### Security operations
+- `npm run whitelist:verify`
+- `npm run quarantine:apply -- --report data/security-reports/YYYY-MM-DD/report.json`
+
+---
+
+## End-to-End Use Cases (With Screenshots)
+
+### 1) First-time onboarding for any project
+Command:
+```bash
+npm run init
+```
+
+![Init Wizard](assets/screenshots/01-init.svg)
+
+### 2) Validate environment readiness
+Command:
+```bash
+npm run doctor
+```
+
+![Doctor Checks](assets/screenshots/02-doctor.svg)
+
+### 3) Browse and search catalog quickly
+Commands:
+```bash
+npm run list -- --kind mcp --limit 3
+npm run search -- security
+npm run show -- --id copilot-extension:repo-security
+```
+
+![List and Search](assets/screenshots/03-list-search.svg)
+
+### 4) Generate safe recommendations and export
+Commands:
+```bash
+npm run dev -- recommend --project . --only-safe --sort trust --limit 5
+npm run dev -- recommend --project . --export csv --out recommendations.csv
+```
+
+![Recommendations and Export](assets/screenshots/04-recommend.svg)
+
+### 5) Enforce risk policy before install
+Commands:
+```bash
+npm run dev -- assess --id mcp:remote-browser
+npm run dev -- install --id mcp:remote-browser --yes
+npm run dev -- install --id mcp:remote-browser --yes --override-risk
+```
+
+![Install and Risk Gates](assets/screenshots/05-install.svg)
+
+### 6) Continuous trust operations (verify + quarantine)
+Commands:
+```bash
+npm run whitelist:verify
+npm run quarantine:apply -- --report data/security-reports/YYYY-MM-DD/report.json
+```
+
+![Security Operations](assets/screenshots/06-security.svg)
+
+---
+
+## Full Remotion Walkthrough Video
+
+The full walkthrough composition is implemented and ready to render:
+- `src/commands/ExplainerVideo.tsx`
+- `src/video/Root.tsx`
+- `src/video/index.ts`
+
+### Scene coverage
+1. Intro and framework scope
+2. Init wizard onboarding
+3. Doctor diagnostics
+4. Sync dry-run and sync
+5. List/search/show discovery
+6. Recommendation visualization
+7. Export flows (CSV/Markdown)
+8. Assess and install policy gating
+9. Whitelist/quarantine security operations
+10. CI and security scan coverage
+11. Final operational CTA
+
+### Preview locally
+```bash
+npm run video:preview
+```
+
+### Render full walkthrough
+```bash
+npm run video:render
+```
+
+Output target:
+- `out/framework-walkthrough.mp4`
+
+### Embedded video block (renders when the MP4 exists)
+
+<video controls width="100%" src="out/framework-walkthrough.mp4">
+  Your browser does not support embedded video playback.
+</video>
+
+---
+
+## CI and Security Gates
+
+### Workflows
+- `.github/workflows/ci.yml`
+- `.github/workflows/security-codeql.yml`
+- `.github/workflows/security-dependency-review.yml`
+- `.github/workflows/security-secrets.yml`
+- `.github/workflows/security-sbom-trivy.yml`
+- `.github/workflows/daily-security.yml`
+- `.github/workflows/catalog-sync.yml`
+
+### Security gate policy
+
+| Check | Scope | Enforcement |
+| --- | --- | --- |
+| CodeQL | JS/TS code scanning | Blocking |
+| Dependency Review | PR dependency changes | Blocking on High/Critical |
+| Secrets (gitleaks) | Repository secret leakage | Blocking |
+| Trivy SCA | Filesystem vulnerability scan | Blocking on High/Critical |
+| Whitelist Verify | Catalog/policy alignment | Blocking in CI |
+
+### Risk tiers
 
 | Tier | Score | Default install policy |
 | --- | --- | --- |
@@ -93,84 +309,51 @@ npm run dev -- recommend --project . --format json --kind skill,mcp,claude-plugi
 | high | 50-74 | block |
 | critical | 75-100 | block |
 
-Use `--override-risk` when you intentionally accept risk. All installs generate audit records under `data/security-reports/audits/`.
+Use `--override-risk` only for explicit risk acceptance.
 
-## Configuration
+---
+
+## Configuration Reference
 
 | File | Purpose |
 | --- | --- |
 | `config/registries.json` | Source registries and adapter mapping |
-| `config/providers.json` | Provider policy (enabled, official-only, auth env, poll settings) |
-| `config/security-policy.json` | Risk scoring weights + block/warn gate thresholds |
-| `config/ranking-policy.json` | Ranking weights, penalties, tie-break behavior |
+| `config/providers.json` | Provider policy (enabled, official-only, auth env, polling) |
+| `config/security-policy.json` | Scoring weights and install gates |
+| `config/ranking-policy.json` | Ranking weights/penalties/tiebreaks |
+| `.skills-mcps.json` | Optional local project defaults from `init` |
 
-### Remote registry fields
+Remote registry fields:
+- `remote.url`
+- `remote.format`
+- `remote.entryPath`
+- `remote.supportsUpdatedSince`
+- `remote.updatedSinceParam`
+- `remote.pagination`
+- `remote.authEnv`
+- `remote.fallbackToLocal`
 
-- `remote.url`: HTTP JSON endpoint
-- `remote.format`: `json-array` or `catalog-json`
-- `remote.entryPath`: optional dot path for `catalog-json`
-- `remote.supportsUpdatedSince`: enable incremental pulls
-- `remote.updatedSinceParam`: query parameter name (default `updated_since`)
-- `remote.pagination`: cursor pagination settings
-- `remote.authEnv`: bearer token environment variable name
-- `remote.fallbackToLocal`: use local `entries` when remote fetch fails
-
-Incremental sync state is stored in `data/catalog/sync-state.json`.
-
-## CI and Security
-
-### Quality and policy validation
-
-- `.github/workflows/ci.yml`
-- Runs lint, test, build on Node 18 and 20
-- Verifies whitelist policy and offline sync reproducibility
-
-### Security scans (blocking)
-
-- `.github/workflows/security-codeql.yml` (CodeQL)
-- `.github/workflows/security-dependency-review.yml` (PR dependency risk)
-- `.github/workflows/security-secrets.yml` (gitleaks)
-- `.github/workflows/security-sbom-trivy.yml` (SBOM + Trivy)
-
-### Scheduled operations
-
-- `.github/workflows/daily-security.yml` (verify + quarantine automation)
-- `.github/workflows/catalog-sync.yml` (daily catalog refresh)
-
-### Dependency automation
-
-- `.github/dependabot.yml` (weekly npm and GitHub Actions updates)
-
-### Security gate policy
-
-| Check | Scope | Enforcement |
-| --- | --- | --- |
-| CodeQL | JS/TS code scanning | blocking |
-| Dependency Review | PR dependency changes | blocking on High/Critical |
-| Secrets (gitleaks) | Repository secret leakage | blocking |
-| Trivy SCA | Filesystem vulnerability scan | blocking on High/Critical |
-| Whitelist Verify | Catalog/policy alignment | blocking in CI |
+---
 
 ## Data Contracts
 
-Primary runtime contracts are validated with Zod:
+Primary runtime contracts validated with Zod:
 - `CatalogItem`
 - `RiskAssessment`
 - `Recommendation`
 - `InstallAudit`
 
+---
+
 ## Backward Compatibility
 
-Legacy command aliases are still supported:
+Legacy aliases remain supported:
 - `ingest` -> `sync`
 - `validate` -> `whitelist verify`
 
-## Security and Operations Docs
+---
 
+## Security and Operations Docs
 - `docs/security/threat-model.md`
 - `docs/security/scoring.md`
 - `docs/ci/daily-quarantine.md`
-
-## Marketing Asset
-
-`src/commands/ExplainerVideo.tsx` contains the Remotion explainer composition used for project storytelling/demo content.

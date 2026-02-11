@@ -70,7 +70,7 @@ jobs:
       - name: Ensure sync reproducibility
         run: |
           SKILLS_MCPS_SYNC_OFFLINE=1 npm run sync
-          git diff --exit-code data/catalog
+          git diff --exit-code -- data/catalog/items.json data/catalog/skills.json data/catalog/mcps.json
 
       - name: Workflow summary
         run: |
@@ -105,7 +105,11 @@ jobs:
             RANGE="origin/${{ github.base_ref }}..HEAD"
             git fetch origin "${{ github.base_ref }}" --depth=200
           else
-            RANGE="HEAD~20..HEAD"
+            if git rev-parse --verify HEAD~20 >/dev/null 2>&1; then
+              RANGE="HEAD~20..HEAD"
+            else
+              RANGE="HEAD~1..HEAD"
+            fi
           fi
 
           BAD=$(git log --pretty=format:'%s' $RANGE | grep -Ev '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+' || true)

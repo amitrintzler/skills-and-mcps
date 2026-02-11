@@ -3,6 +3,8 @@ name: Security / SBOM + Trivy
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main"]
   schedule:
     - cron: '45 2 * * 1'
   workflow_dispatch:
@@ -41,7 +43,7 @@ jobs:
           output: trivy-results.sarif
           severity: HIGH,CRITICAL
           ignore-unfixed: false
-          exit-code: '1'
+          exit-code: ${{ github.event_name == 'pull_request' && '1' || '0' }}
 
       - name: Run Trivy (JSON report)
         if: always()
