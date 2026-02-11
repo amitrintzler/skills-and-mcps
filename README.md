@@ -2,11 +2,18 @@
 
 <p align="center">
   <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml/badge.svg?branch=main" /></a>
-  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml"><img alt="Catalog Sync" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml/badge.svg?branch=main" /></a>
-  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml"><img alt="Daily Security" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml/badge.svg?branch=main" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml"><img alt="Catalog Sync" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml/badge.svg?event=schedule" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml"><img alt="Daily Security" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/daily-security.yml/badge.svg?event=schedule" /></a>
   <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml"><img alt="Security / CodeQL" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-codeql.yml/badge.svg?branch=main" /></a>
-  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml"><img alt="Security / Dependency Review" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml/badge.svg?branch=main" /></a>
+  <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml"><img alt="Security / Dependency Review" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/security-dependency-review.yml/badge.svg?event=pull_request" /></a>
   <a href="https://nodejs.org/"><img alt="Node >=18.17" src="https://img.shields.io/badge/node-%3E%3D18.17-339933?logo=node.js&logoColor=white" /></a>
+</p>
+
+<p align="center">
+  <sub>
+    Note: <strong>Dependency Review</strong> is PR-triggered, and <strong>Catalog Sync</strong> is scheduled/manual.
+    These two badges may show <em>no status</em> until they run on <code>main</code>.
+  </sub>
 </p>
 
 <p align="center">
@@ -21,6 +28,8 @@
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
+  <a href="#how-to-use-this-cli">How To Use</a> •
+  <a href="#where-is-the-video">Where Is The Video</a> •
   <a href="#full-cli-capability-map">CLI Map</a> •
   <a href="#end-to-end-use-cases-with-screenshots">Use Cases</a> •
   <a href="#full-remotion-walkthrough-video">Video Walkthrough</a> •
@@ -143,6 +152,51 @@ For current project recommendations:
 ```bash
 npm run dev -- recommend --project . --only-safe --sort trust --limit 10
 ```
+
+## How To Use This CLI
+
+If you want the simplest flow for any project:
+
+```bash
+# 1) Install and run guided setup
+npm install
+npm run init
+
+# 2) Validate your environment
+npm run doctor
+
+# 3) Sync latest catalog data
+npm run sync
+
+# 4) Discover best options for your current repo
+npm run top -- --project . --limit 5
+
+# 5) Inspect and install safely
+npm run show -- --id mcp:filesystem
+npm run dev -- assess --id mcp:filesystem
+npm run dev -- install --id mcp:filesystem --yes
+```
+
+Recommended daily usage:
+
+```bash
+npm run sync
+npm run dev -- recommend --project . --only-safe --sort trust --limit 10
+```
+
+## Where Is The Video
+
+The walkthrough video is expected at:
+- `out/framework-walkthrough.mp4`
+
+How to generate it locally:
+
+```bash
+npm run video:preview
+npm run video:render
+```
+
+If the file does not exist yet, it means render has not been run successfully in your environment.
 
 ---
 
@@ -270,6 +324,10 @@ npm run video:render
 
 Output target:
 - `out/framework-walkthrough.mp4`
+
+If render fails, check:
+- Remotion dependency versions are aligned.
+- Headless Chrome download/availability is allowed on your machine/network.
 
 ### Embedded video block (renders when the MP4 exists)
 
