@@ -139,6 +139,14 @@ flowchart LR
 
 ## Quick Start
 
+Prerequisite (required):
+
+```bash
+skill.sh --version
+```
+
+If this command fails, install `skill.sh` first, then continue.
+
 ```bash
 npm install
 npm run init
@@ -159,6 +167,7 @@ If you want the simplest flow for any project:
 
 ```bash
 # 1) Install and run guided setup
+skill.sh --version
 npm install
 npm run init
 

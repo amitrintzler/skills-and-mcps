@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
 import { loadSecurityPolicy } from '../config/runtime.js';
 import { loadCatalogItemById } from '../catalog/repository.js';
@@ -63,10 +64,12 @@ async function executeInstall(
   }
 
   if (install.kind === 'skill.sh') {
+    ensureBinaryAvailable('skill.sh', 'skill.sh is required. Install it and verify with: skill.sh --version');
     const commandArgs = buildSkillShInstallArgs(install.target, install.args, yes);
     return executeCommand('skill.sh', commandArgs, 'skill.sh');
   }
 
+  ensureBinaryAvailable('gh', 'gh CLI is required for gh-cli installers. Install it and verify with: gh --version');
   const commandArgs = buildGhInstallArgs(install.target, install.args, yes);
   return executeCommand('gh', commandArgs, 'gh');
 }
@@ -109,6 +112,13 @@ async function executeCommand(binary: string, args: string[], label: string): Pr
       resolve(code ?? 1);
     });
   });
+}
+
+function ensureBinaryAvailable(binary: string, suggestion: string): void {
+  const result = spawnSync('which', [binary], { encoding: 'utf8' });
+  if (result.status !== 0) {
+    throw new Error(`${binary} is not available in PATH. ${suggestion}`);
+  }
 }
 
 async function persistAudit(record: InstallAudit): Promise<InstallAudit> {
