@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="80" y="80" width="1120" height="560" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <text x="120" y="140" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#38bdf8">$ npm run dev -- assess --id mcp:remote-browser</text>
+  <text x="120" y="195" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#ef4444">riskTier: high</text>
+  <text x="120" y="225" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#ef4444">riskScore: 59</text>
+  <text x="120" y="285" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#38bdf8">$ npm run dev -- install --id mcp:remote-browser --yes</text>
+  <text x="120" y="340" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#ef4444">Blocked by security policy (high, score=59)</text>
+  <text x="120" y="395" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#38bdf8">$ npm run dev -- install --id mcp:remote-browser --yes --override-risk</text>
+  <text x="120" y="450" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">policyDecision: override-allowed</text>
+</svg>

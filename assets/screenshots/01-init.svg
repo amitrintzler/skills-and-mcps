@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="90" y="80" width="1100" height="560" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <text x="130" y="140" font-family="Menlo, Monaco, Consolas, monospace" font-size="26" fill="#38bdf8">$ npm run init</text>
+  <text x="130" y="200" font-family="Menlo, Monaco, Consolas, monospace" font-size="20" fill="#e2e8f0">Default kinds [skill,mcp,copilot-extension]:</text>
+  <text x="130" y="245" font-family="Menlo, Monaco, Consolas, monospace" font-size="20" fill="#e2e8f0">Default providers [anthropic,github,mcp,openai]:</text>
+  <text x="130" y="290" font-family="Menlo, Monaco, Consolas, monospace" font-size="20" fill="#e2e8f0">Risk posture [balanced|strict]: strict</text>
+  <text x="130" y="335" font-family="Menlo, Monaco, Consolas, monospace" font-size="20" fill="#e2e8f0">Run initial sync now? [Y/n]: Y</text>
+  <text x="130" y="410" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#22c55e">Initialized local CLI config: .skills-mcps.json</text>
+  <text x="130" y="450" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#93c5fd">Hint: Run npm run doctor to verify local setup.</text>
+</svg>

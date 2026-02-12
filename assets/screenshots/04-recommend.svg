@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="60" y="70" width="1160" height="580" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <text x="100" y="125" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#38bdf8">$ npm run dev -- recommend --project . --only-safe --sort trust --limit 5</text>
+  <text x="100" y="180" font-family="Menlo, Monaco, Consolas, monospace" font-size="16" fill="#e2e8f0">mcp:filesystem                  rank 51.7  trust 41.8  fit 8.3   low(10)  false</text>
+  <text x="100" y="215" font-family="Menlo, Monaco, Consolas, monospace" font-size="16" fill="#e2e8f0">skill:secure-prompting          rank 50.9  trust 37.8  fit 8.3   low(0)   false</text>
+  <text x="100" y="250" font-family="Menlo, Monaco, Consolas, monospace" font-size="16" fill="#e2e8f0">copilot-extension:repo-security rank 50.6  trust 38.6  fit 6.3   low(0)   false</text>
+  <text x="100" y="325" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#38bdf8">$ npm run dev -- recommend --project . --export csv --out recommendations.csv</text>
+  <text x="100" y="375" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">Exported 5 recommendations to recommendations.csv</text>
+</svg>

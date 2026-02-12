@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="70" y="70" width="1140" height="580" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <text x="110" y="130" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#38bdf8">$ npm run whitelist:verify</text>
+  <text x="110" y="190" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#e2e8f0">reportPath: data/security-reports/YYYY-MM-DD/report.json</text>
+  <text x="110" y="225" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#e2e8f0">failed: 1</text>
+  <text x="110" y="285" font-family="Menlo, Monaco, Consolas, monospace" font-size="22" fill="#38bdf8">$ npm run quarantine:apply -- --report data/security-reports/YYYY-MM-DD/report.json</text>
+  <text x="110" y="345" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">removedFromWhitelist: ["mcp:remote-browser"]</text>
+  <text x="110" y="380" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">quarantined: 1</text>
+  <text x="110" y="450" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#93c5fd">Daily automation runs in GitHub Actions workflows.</text>
+</svg>

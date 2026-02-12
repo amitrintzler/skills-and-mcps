@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="70" y="70" width="1140" height="580" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <text x="110" y="130" font-family="Menlo, Monaco, Consolas, monospace" font-size="26" fill="#38bdf8">$ npm run doctor</text>
+  <text x="110" y="190" font-family="Menlo, Monaco, Consolas, monospace" font-size="20" fill="#e2e8f0">CHECK                 STATUS   MESSAGE</text>
+  <text x="110" y="230" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">gh                    pass     gh available</text>
+  <text x="110" y="265" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">Node version          pass     Node 22.16.0</text>
+  <text x="110" y="300" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#eab308">skill.sh              warn     skill.sh not found</text>
+  <text x="110" y="335" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">Catalog               pass     6 items loaded</text>
+  <text x="110" y="370" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#22c55e">Sync freshness        pass     No stale registries</text>
+  <text x="110" y="430" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#93c5fd">Hint: Resolve warnings before install workflows.</text>
+</svg>

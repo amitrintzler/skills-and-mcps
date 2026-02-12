@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="70" y="70" width="1140" height="580" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <text x="110" y="130" font-family="Menlo, Monaco, Consolas, monospace" font-size="24" fill="#38bdf8">$ npm run list -- --kind mcp --limit 3</text>
+  <text x="110" y="185" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#e2e8f0">mcp:filesystem         mcp      mcp        low(10)      false</text>
+  <text x="110" y="220" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#e2e8f0">mcp:remote-browser     mcp      mcp        high(59)     true</text>
+  <text x="110" y="290" font-family="Menlo, Monaco, Consolas, monospace" font-size="24" fill="#38bdf8">$ npm run search -- security</text>
+  <text x="110" y="345" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#e2e8f0">copilot-extension:repo-security   copilot-extension   github</text>
+  <text x="110" y="405" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" fill="#93c5fd">Hint: Use show --id &lt;catalog-id&gt; for full detail.</text>
+</svg>
