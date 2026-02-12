@@ -15,11 +15,8 @@ const palette = {
 
 const sceneDuration = 300;
 
-const frameInScene = (globalFrame: number, from: number): number => Math.max(0, globalFrame - from);
-
-const FadeScene: React.FC<{ from: number; duration: number; children: React.ReactNode }> = ({ from, duration, children }) => {
-  const frame = useCurrentFrame();
-  const local = frameInScene(frame, from);
+const FadeScene: React.FC<{ duration: number; children: React.ReactNode }> = ({ duration, children }) => {
+  const local = useCurrentFrame();
   const fade = Math.min(24, Math.floor(duration * 0.1));
   const opacity = interpolate(local, [0, fade, duration - fade, duration], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
@@ -286,14 +283,14 @@ export const ExplainerVideo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: palette.bg }}>
       {scenes.map((Scene, index) => {
-        const from = index * sceneDuration;
-        return (
-          <Sequence key={from} from={from} durationInFrames={sceneDuration}>
-            <FadeScene from={from} duration={sceneDuration}>
-              <Scene />
-            </FadeScene>
-          </Sequence>
-        );
+          const from = index * sceneDuration;
+          return (
+            <Sequence key={from} from={from} durationInFrames={sceneDuration}>
+              <FadeScene duration={sceneDuration}>
+                <Scene />
+              </FadeScene>
+            </Sequence>
+          );
       })}
     </AbsoluteFill>
   );

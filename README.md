@@ -186,14 +186,12 @@ npm run dev -- recommend --project . --only-safe --sort trust --limit 10
 
 ## Video Walkthrough
 
-Direct video link:
+Click the preview to open the full walkthrough video:
+
+[![Framework Walkthrough Preview](out/framework-walkthrough-preview.gif)](https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4)
+
+Direct MP4 link:
 - https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4
-
-<video controls width="100%" preload="metadata" src="https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4">
-  Your browser does not support embedded video playback.
-</video>
-
-If the player does not render in your viewer, use the direct link above.
 
 ---
 
@@ -321,19 +319,16 @@ npm run video:render
 
 Output target:
 - `out/framework-walkthrough.mp4`
+- `out/framework-walkthrough-preview.gif`
 
 If render fails, check:
 - Remotion dependency versions are aligned.
 - Headless Chrome download/availability is allowed on your machine/network.
 
-### Embedded video block
+### GitHub-friendly embed strategy
 
-Direct link:
-- https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4
-
-<video controls width="100%" src="https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4">
-  Your browser does not support embedded video playback.
-</video>
+GitHub and mobile viewers can be inconsistent with inline `<video>` tags.
+Use the GIF preview + MP4 link in the `Video Walkthrough` section for reliable playback access.
 
 ---
 
