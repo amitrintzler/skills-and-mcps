@@ -115,6 +115,9 @@ async function executeCommand(binary: string, args: string[], label: string): Pr
 }
 
 function ensureBinaryAvailable(binary: string, suggestion: string): void {
+  if (process.env.SKILLS_MCPS_INSTALL_DRY_RUN === '1') {
+    return;
+  }
   const result = spawnSync('which', [binary], { encoding: 'utf8' });
   if (result.status !== 0) {
     throw new Error(`${binary} is not available in PATH. ${suggestion}`);

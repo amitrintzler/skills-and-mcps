@@ -33,7 +33,6 @@
   <a href="#video-walkthrough">Video Walkthrough</a> •
   <a href="#full-cli-capability-map">CLI Map</a> •
   <a href="#end-to-end-use-cases-with-screenshots">Use Cases</a> •
-  <a href="#full-remotion-walkthrough-video">Video Production</a> •
   <a href="#ci-and-security-gates">Security</a>
 </p>
 
@@ -302,53 +301,6 @@ npm run quarantine:apply -- --report data/security-reports/YYYY-MM-DD/report.jso
 ```
 
 ![Security Operations](assets/screenshots/06-security.svg)
-
----
-
-## Full Remotion Walkthrough Video
-
-The full walkthrough composition is implemented and ready to render:
-- `src/commands/ExplainerVideo.tsx`
-- `src/video/Root.tsx`
-- `src/video/index.ts`
-
-This video now demonstrates real CLI usage patterns from live command runs (`about`, `doctor`, `list`, `search`, `show`, `recommend`, `assess`, `sync --dry-run`).
-
-### Scene coverage
-1. Intro and framework scope
-2. Init wizard onboarding
-3. Doctor diagnostics
-4. Sync dry-run and sync
-5. List/search/show discovery
-6. Recommendation visualization
-7. Export flows (CSV/Markdown)
-8. Assess and install policy gating
-9. Whitelist/quarantine security operations
-10. CI and security scan coverage
-11. Final operational CTA
-
-### Preview locally
-```bash
-npm run video:preview
-```
-
-### Render full walkthrough
-```bash
-npm run video:render
-```
-
-Output target:
-- `out/framework-walkthrough.mp4`
-- `out/framework-walkthrough-preview.gif`
-
-If render fails, check:
-- Remotion dependency versions are aligned.
-- Headless Chrome download/availability is allowed on your machine/network.
-
-### GitHub-friendly embed strategy
-
-GitHub and mobile viewers can be inconsistent with inline `<video>` tags.
-Use the GIF preview + MP4 link in the `Video Walkthrough` section for reliable playback access.
 
 ---
 
