@@ -11,8 +11,8 @@
 
 <p align="center">
   <sub>
-    Gatekeeping checks tracked as pass/fail: <strong>CI</strong>, <strong>Daily Security</strong>, and <strong>Security / CodeQL</strong>.
-    Catalog Sync and Dependency Review are still enabled and linked above.
+    Production gates tracked as pass/fail: <strong>CI</strong>, <strong>Daily Security</strong>, and <strong>Security / CodeQL</strong>.
+    Scheduled sync and PR dependency review are enabled and linked above.
   </sub>
 </p>
 
@@ -28,6 +28,7 @@
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
+  <a href="#prerequisites">Prerequisites</a> •
   <a href="#how-to-use-this-cli">How To Use</a> •
   <a href="#video-walkthrough">Video Walkthrough</a> •
   <a href="#full-cli-capability-map">CLI Map</a> •
@@ -37,6 +38,22 @@
 </p>
 
 ---
+
+## Prerequisites
+
+- Node.js `>=18.17`
+- npm
+- `skill.sh` (required)
+- `gh` CLI (recommended for GitHub-based install flows)
+
+Verify locally:
+
+```bash
+node -v
+npm -v
+skill.sh --version
+gh --version
+```
 
 ## Why this framework
 
@@ -139,14 +156,6 @@ flowchart LR
 
 ## Quick Start
 
-Prerequisite (required):
-
-```bash
-skill.sh --version
-```
-
-If this command fails, install `skill.sh` first, then continue.
-
 ```bash
 npm install
 npm run init
@@ -158,7 +167,7 @@ npm run top -- --limit 5
 For current project recommendations:
 
 ```bash
-npm run dev -- recommend --project . --only-safe --sort trust --limit 10
+npm run recommend -- --project . --only-safe --sort trust --limit 10
 ```
 
 ## How To Use This CLI
@@ -182,15 +191,15 @@ npm run top -- --project . --limit 5
 
 # 5) Inspect and install safely
 npm run show -- --id mcp:filesystem
-npm run dev -- assess --id mcp:filesystem
-npm run dev -- install --id mcp:filesystem --yes
+npm run assess -- --id mcp:filesystem
+npm run install:item -- --id mcp:filesystem --yes
 ```
 
 Recommended daily usage:
 
 ```bash
 npm run sync
-npm run dev -- recommend --project . --only-safe --sort trust --limit 10
+npm run recommend -- --project . --only-safe --sort trust --limit 10
 ```
 
 ## Video Walkthrough
@@ -222,15 +231,15 @@ Direct MP4 link:
 - `npm run top -- --project . --limit 5`
 
 ### Recommendation and export
-- `npm run dev -- recommend --project . --format table`
-- `npm run dev -- recommend --project . --only-safe --sort trust --limit 10`
-- `npm run dev -- recommend --project . --export csv --out recommendations.csv`
-- `npm run dev -- recommend --project . --export md --out recommendations.md`
+- `npm run recommend -- --project . --format table`
+- `npm run recommend -- --project . --only-safe --sort trust --limit 10`
+- `npm run recommend -- --project . --export csv --out recommendations.csv`
+- `npm run recommend -- --project . --export md --out recommendations.md`
 
 ### Risk and installation controls
-- `npm run dev -- assess --id mcp:remote-browser`
-- `npm run dev -- install --id mcp:filesystem --yes`
-- `npm run dev -- install --id mcp:remote-browser --yes --override-risk`
+- `npm run assess -- --id mcp:remote-browser`
+- `npm run install:item -- --id mcp:filesystem --yes`
+- `npm run install:item -- --id mcp:remote-browser --yes --override-risk`
 
 ### Security operations
 - `npm run whitelist:verify`
@@ -269,8 +278,8 @@ npm run show -- --id copilot-extension:repo-security
 ### 4) Generate safe recommendations and export
 Commands:
 ```bash
-npm run dev -- recommend --project . --only-safe --sort trust --limit 5
-npm run dev -- recommend --project . --export csv --out recommendations.csv
+npm run recommend -- --project . --only-safe --sort trust --limit 5
+npm run recommend -- --project . --export csv --out recommendations.csv
 ```
 
 ![Recommendations and Export](assets/screenshots/04-recommend.svg)
@@ -278,9 +287,9 @@ npm run dev -- recommend --project . --export csv --out recommendations.csv
 ### 5) Enforce risk policy before install
 Commands:
 ```bash
-npm run dev -- assess --id mcp:remote-browser
-npm run dev -- install --id mcp:remote-browser --yes
-npm run dev -- install --id mcp:remote-browser --yes --override-risk
+npm run assess -- --id mcp:remote-browser
+npm run install:item -- --id mcp:remote-browser --yes
+npm run install:item -- --id mcp:remote-browser --yes --override-risk
 ```
 
 ![Install and Risk Gates](assets/screenshots/05-install.svg)
@@ -302,6 +311,8 @@ The full walkthrough composition is implemented and ready to render:
 - `src/commands/ExplainerVideo.tsx`
 - `src/video/Root.tsx`
 - `src/video/index.ts`
+
+This video now demonstrates real CLI usage patterns from live command runs (`about`, `doctor`, `list`, `search`, `show`, `recommend`, `assess`, `sync --dry-run`).
 
 ### Scene coverage
 1. Intro and framework scope
@@ -412,6 +423,16 @@ Primary runtime contracts validated with Zod:
 Legacy aliases remain supported:
 - `ingest` -> `sync`
 - `validate` -> `whitelist verify`
+
+---
+
+## Publish Checklist
+
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `npm run doctor` (must pass required checks, including `skill.sh`)
+- Confirm Actions badges are green on `main`
 
 ---
 
