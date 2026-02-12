@@ -1,7 +1,7 @@
 import React from 'react';
 import { Composition } from 'remotion';
 
-import { ExplainerVideo, walkthroughDurationInFrames } from '../commands/ExplainerVideo';
+import { ExplainerVideo, walkthroughDurationInFrames } from '../commands/ExplainerVideo.js';
 
 export const RemotionRoot: React.FC = () => {
   return (
