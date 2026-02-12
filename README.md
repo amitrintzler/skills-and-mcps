@@ -331,7 +331,10 @@ If render fails, check:
 
 ### Embedded video block (renders when the MP4 exists)
 
-<video controls width="100%" src="out/framework-walkthrough.mp4">
+Direct link:
+- https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4
+
+<video controls width="100%" src="https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4">
   Your browser does not support embedded video playback.
 </video>
 
