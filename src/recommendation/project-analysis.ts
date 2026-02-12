@@ -45,6 +45,26 @@ export async function detectProjectSignals(projectPath: string): Promise<Project
     compatibilityTags.add('container');
   }
 
+  if ((await fs.pathExists(path.join(root, 'pom.xml'))) || (await fs.pathExists(path.join(root, 'build.gradle')))) {
+    stack.add('java');
+    compatibilityTags.add('java');
+  }
+
+  if (await fs.pathExists(path.join(root, 'go.mod'))) {
+    stack.add('go');
+    compatibilityTags.add('go');
+  }
+
+  if (await fs.pathExists(path.join(root, 'Cargo.toml'))) {
+    stack.add('rust');
+    compatibilityTags.add('rust');
+  }
+
+  if (await fs.pathExists(path.join(root, 'Gemfile'))) {
+    stack.add('ruby');
+    compatibilityTags.add('ruby');
+  }
+
   if (stack.size === 0) {
     stack.add('unknown');
     compatibilityTags.add('general');
