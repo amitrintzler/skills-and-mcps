@@ -1,305 +1,302 @@
 import React from 'react';
-import { AbsoluteFill, Sequence, useCurrentFrame, interpolate, useVideoConfig, spring } from 'remotion';
+import { AbsoluteFill, Sequence, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 
-// --- Styles & Components ---
-
-const colors = {
-  bg: '#0f172a', // Slate 900
-  text: '#f8fafc', // Slate 50
-  accent: '#38bdf8', // Sky 400
-  danger: '#ef4444', // Red 500
-  success: '#22c55e', // Green 500
-  terminalBg: '#1e293b', // Slate 800
-  terminalHeader: '#334155', // Slate 700
+const palette = {
+  bg: '#0b1220',
+  panel: '#111827',
+  panelBorder: '#334155',
+  text: '#e5e7eb',
+  muted: '#94a3b8',
+  accent: '#22d3ee',
+  success: '#22c55e',
+  warn: '#f59e0b',
+  danger: '#ef4444'
 };
 
-const fontStyle: React.CSSProperties = {
-  fontFamily: 'system-ui, -apple-system, sans-serif',
-  color: colors.text,
-  fontWeight: 'bold',
-};
+const sceneDuration = 300;
 
-const Center: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg, ...fontStyle }}>
-    {children}
-  </AbsoluteFill>
-);
+const frameInScene = (globalFrame: number, from: number): number => Math.max(0, globalFrame - from);
 
-const Title: React.FC<{ text: string; subText?: string; color?: string }> = ({ text, subText, color = colors.text }) => {
+const FadeScene: React.FC<{ from: number; duration: number; children: React.ReactNode }> = ({ from, duration, children }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 20], [0, 1], { extrapolateRight: 'clamp' });
-  const translateY = interpolate(frame, [0, 20], [20, 0], { extrapolateRight: 'clamp' });
-
-  return (
-    <div style={{ textAlign: 'center', opacity, transform: `translateY(${translateY}px)` }}>
-      <h1 style={{ fontSize: 80, margin: 0, color }}>{text}</h1>
-      {subText && <h2 style={{ fontSize: 40, marginTop: 20, color: colors.accent, opacity: 0.8 }}>{subText}</h2>}
-    </div>
-  );
-};
-
-const TerminalWindow: React.FC<{ command: string; output?: React.ReactNode; delay?: number }> = ({ command, output, delay = 0 }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  
-  // Typing effect
-  const startFrame = delay;
-  const charsToShow = Math.floor(interpolate(frame - startFrame, [0, 40], [0, command.length], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }));
-  const cursorVisible = Math.floor(frame / 15) % 2 === 0;
-  
-  // Output visibility
-  const showOutput = frame > startFrame + 45;
-  const outputOpacity = interpolate(frame - (startFrame + 45), [0, 10], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-
-  return (
-    <div style={{
-      width: '80%',
-      maxWidth: 1000,
-      backgroundColor: colors.terminalBg,
-      borderRadius: 12,
-      overflow: 'hidden',
-      boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-      fontFamily: 'monospace',
-      fontSize: 32,
-      textAlign: 'left'
-    }}>
-      <div style={{ height: 40, backgroundColor: colors.terminalHeader, display: 'flex', alignItems: 'center', paddingLeft: 16 }}>
-        <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ff5f56', marginRight: 8 }} />
-        <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ffbd2e', marginRight: 8 }} />
-        <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#27c93f' }} />
-      </div>
-      <div style={{ padding: 40, minHeight: 300 }}>
-        <div style={{ color: colors.accent, marginBottom: 20 }}>
-          <span style={{ color: colors.success }}>➜</span> ~ {command.slice(0, charsToShow)}{cursorVisible ? '▋' : ''}
-        </div>
-        {showOutput && (
-          <div style={{ opacity: outputOpacity, whiteSpace: 'pre-wrap', color: '#cbd5e1', fontSize: 24 }}>
-            {output}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const TransitionWrapper: React.FC<{ children: React.ReactNode; duration: number }> = ({ children, duration }) => {
-  const frame = useCurrentFrame();
-  const transitionDuration = 15;
-
-  const opacity = interpolate(
-    frame,
-    [0, transitionDuration, duration - transitionDuration, duration],
-    [0, 1, 1, 0]
-  );
+  const local = frameInScene(frame, from);
+  const fade = Math.min(24, Math.floor(duration * 0.1));
+  const opacity = interpolate(local, [0, fade, duration - fade, duration], [0, 1, 1, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp'
+  });
 
   return <AbsoluteFill style={{ opacity }}>{children}</AbsoluteFill>;
 };
 
-// --- Scenes ---
+const TitleBlock: React.FC<{ title: string; subtitle: string }> = ({ title, subtitle }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const rise = spring({ frame, fps, config: { damping: 16 } });
 
-const Scene1_Problem: React.FC = () => {
   return (
-    <Center>
-      <Title text="The Problem" color={colors.danger} />
-      <div style={{ display: 'flex', gap: 40, marginTop: 60 }}>
-        <div style={{ padding: 30, border: `2px solid ${colors.terminalHeader}`, borderRadius: 10 }}>
-          Scattered Registries?
-        </div>
-        <div style={{ padding: 30, border: `2px solid ${colors.terminalHeader}`, borderRadius: 10 }}>
-          Unverified Code?
-        </div>
-        <div style={{ padding: 30, border: `2px solid ${colors.terminalHeader}`, borderRadius: 10 }}>
-          Security Risks?
-        </div>
-      </div>
-    </Center>
+    <div style={{ textAlign: 'center', transform: `translateY(${(1 - rise) * 20}px)` }}>
+      <h1 style={{ fontSize: 68, margin: 0, color: palette.text }}>{title}</h1>
+      <p style={{ fontSize: 28, marginTop: 18, color: palette.accent }}>{subtitle}</p>
+    </div>
   );
 };
 
-const Scene2_Solution: React.FC = () => {
-  return (
-    <Center>
-      <Title text="One Intelligence Hub" subText="Skills + MCP + Claude Plugins" />
-      <div style={{ marginTop: 60 }}>
-        <TerminalWindow 
-          command="npm run sync" 
-          output="✓ Synced 120 skills from 3 registries"
-        />
-      </div>
-    </Center>
-  );
-};
+const TerminalCard: React.FC<{ command: string; lines: string[]; tone?: 'normal' | 'success' | 'warn' | 'danger' }> = ({
+  command,
+  lines,
+  tone = 'normal'
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const appear = spring({ frame, fps, config: { damping: 18 } });
+  const toneColor = tone === 'success' ? palette.success : tone === 'warn' ? palette.warn : tone === 'danger' ? palette.danger : palette.muted;
 
-const Scene3_Recommendations: React.FC = () => {
-  const output = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #475569', paddingBottom: 10 }}>
-        <span>NAME</span><span>SCORE</span><span>REASON</span>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', color: colors.success }}>
-        <span>mcp:filesystem</span><span>98</span><span>Required by package.json</span>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', color: colors.text }}>
-        <span>skill:react-gen</span><span>85</span><span>React project detected</span>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8' }}>
-        <span>mcp:postgres</span><span>40</span><span>Low relevance</span>
+  return (
+    <div
+      style={{
+        width: '86%',
+        maxWidth: 1320,
+        backgroundColor: palette.panel,
+        border: `2px solid ${palette.panelBorder}`,
+        borderRadius: 16,
+        padding: 26,
+        boxShadow: '0 16px 48px rgba(0,0,0,0.35)',
+        transform: `scale(${0.96 + appear * 0.04})`
+      }}
+    >
+      <div style={{ fontFamily: 'Menlo, Monaco, Consolas, monospace', color: palette.accent, fontSize: 28 }}>$ {command}</div>
+      <div style={{ marginTop: 18, display: 'grid', gap: 10 }}>
+        {lines.map((line, index) => (
+          <div
+            key={line}
+            style={{
+              fontFamily: 'Menlo, Monaco, Consolas, monospace',
+              color: index === lines.length - 1 ? toneColor : palette.text,
+              fontSize: 22,
+              whiteSpace: 'pre-wrap'
+            }}
+          >
+            {line}
+          </div>
+        ))}
       </div>
     </div>
   );
-
-  return (
-    <Center>
-      <div style={{ position: 'absolute', top: 100 }}>
-        <Title text="Context-Aware" subText="Recommendations based on YOUR project" />
-      </div>
-      <div style={{ marginTop: 100 }}>
-        <TerminalWindow 
-          command="npm run dev -- recommend --project ." 
-          output={output}
-        />
-      </div>
-    </Center>
-  );
 };
 
-const Scene4_Security: React.FC = () => {
-  const frame = useCurrentFrame();
-  const scale = spring({ frame, fps: 30, config: { damping: 10 } });
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <AbsoluteFill
+    style={{
+      backgroundColor: palette.bg,
+      color: palette.text,
+      fontFamily: 'ui-sans-serif, -apple-system, Segoe UI, Helvetica, Arial, sans-serif',
+      padding: '56px 72px',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }}
+  >
+    {children}
+  </AbsoluteFill>
+);
 
-  return (
-    <Center>
-      <Title text="Security First" subText="Active Risk Scoring" />
-      <div style={{ 
-        marginTop: 60, 
-        padding: 60, 
-        backgroundColor: '#450a0a', 
-        border: `4px solid ${colors.danger}`, 
-        borderRadius: 20,
-        transform: `scale(${scale})`
-      }}>
-        <h2 style={{ color: colors.danger, fontSize: 60, margin: 0 }}>BLOCKED</h2>
-        <p style={{ fontSize: 30, margin: '20px 0' }}>Risk Score: 85 (Critical)</p>
-        <ul style={{ textAlign: 'left', fontSize: 24, color: '#fca5a5' }}>
-          <li>⚠ Unverified Author</li>
-          <li>⚠ Suspicious Network Patterns</li>
-        </ul>
-      </div>
-    </Center>
-  );
-};
+const SceneIntro: React.FC = () => (
+  <Layout>
+    <TitleBlock
+      title="Complete Framework Walkthrough"
+      subtitle="From first run to secure install, quarantine automation, and CI trust"
+    />
+    <TerminalCard
+      command="npm run about"
+      lines={[
+        'skills-and-mcps v0.1.0',
+        'Scope: skills, MCP servers, Claude plugins, Copilot extensions',
+        'Ranking: trust-first, security-gated'
+      ]}
+    />
+  </Layout>
+);
 
-const Scene5_Trust: React.FC = () => {
-  return (
-    <Center>
-      <Title text="Continuous Trust" subText="Daily CI & Auto-Quarantine" />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 60, width: 600 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, fontSize: 30 }}>
-          <span style={{ color: colors.success }}>✓</span> Sync Catalog
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, fontSize: 30 }}>
-          <span style={{ color: colors.success }}>✓</span> Verify Whitelist
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, fontSize: 30 }}>
-          <span style={{ color: colors.success }}>✓</span> Check Vulnerability DB
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, fontSize: 30, opacity: 0.5 }}>
-          <span>...</span> Generating Report
-        </div>
-      </div>
-    </Center>
-  );
-};
+const SceneInit: React.FC = () => (
+  <Layout>
+    <TitleBlock title="1) First-Run Wizard" subtitle="Interactive setup for any project" />
+    <TerminalCard
+      command="npm run init"
+      lines={[
+        'Default kinds [skill,mcp,copilot-extension]:',
+        'Default providers [anthropic,github,mcp,openai]:',
+        'Risk posture [balanced|strict]: strict',
+        'Initialized local CLI config: .skills-mcps.json'
+      ]}
+      tone="success"
+    />
+  </Layout>
+);
 
-const Scene6_CTA: React.FC = () => {
-  return (
-    <Center>
-      <Title text="Start Today" color={colors.accent} />
-      <div style={{ marginTop: 60 }}>
-        <TerminalWindow 
-          command="npm run sync" 
-          output={
-            <div style={{ color: colors.success, marginTop: 20 }}>
-              Ready to install safely.
-            </div>
-          }
-        />
-      </div>
-      <h3 style={{ marginTop: 60, fontSize: 24, color: '#94a3b8' }}>github.com/amitri/skills-and-mcps</h3>
-    </Center>
-  );
-};
+const SceneDoctor: React.FC = () => (
+  <Layout>
+    <TitleBlock title="2) Environment Diagnostics" subtitle="Run doctor before operational workflows" />
+    <TerminalCard
+      command="npm run doctor"
+      lines={[
+        'gh                 pass   gh available',
+        'Node version       pass   Node 22.x',
+        'skill.sh           warn   not found',
+        'Catalog            pass   loaded',
+        'Sync freshness     pass   no stale registries'
+      ]}
+      tone="warn"
+    />
+  </Layout>
+);
 
-// --- Main Composition ---
+const SceneSync: React.FC = () => (
+  <Layout>
+    <TitleBlock title="3) Catalog Sync" subtitle="Dry-run preview then full sync" />
+    <TerminalCard
+      command="npm run dev -- sync --dry-run"
+      lines={[
+        'community-skills-index (skill) entries=2 remote=yes',
+        'public-mcp-directory (mcp) entries=2 remote=yes',
+        'official-claude-plugins (claude-plugin) entries=1 remote=yes',
+        'official-copilot-extensions (copilot-extension) entries=1 remote=yes'
+      ]}
+    />
+  </Layout>
+);
+
+const SceneBrowse: React.FC = () => (
+  <Layout>
+    <TitleBlock title="4) Browse + Search + Inspect" subtitle="Discover quickly, inspect deeply" />
+    <TerminalCard
+      command="npm run list -- --kind mcp --limit 3"
+      lines={[
+        'mcp:filesystem       mcp   mcp   low(10)   false',
+        'mcp:remote-browser   mcp   mcp   high(59)  true',
+        'Use show --id <catalog-id> for full detail'
+      ]}
+    />
+  </Layout>
+);
+
+const SceneRecommend: React.FC = () => (
+  <Layout>
+    <TitleBlock title="5) Rich Recommendations" subtitle="Sorted, filtered, and safe-first by default" />
+    <TerminalCard
+      command="npm run dev -- recommend --project . --only-safe --sort trust --limit 5"
+      lines={[
+        'mcp:filesystem                  rank 51.7  trust 41.8  low(10)  false',
+        'skill:secure-prompting          rank 50.9  trust 37.8  low(0)   false',
+        'copilot-extension:repo-security rank 50.6  trust 38.6  low(0)   false'
+      ]}
+      tone="success"
+    />
+  </Layout>
+);
+
+const SceneExport: React.FC = () => (
+  <Layout>
+    <TitleBlock title="6) Export and Share" subtitle="CSV/Markdown output for docs and governance" />
+    <TerminalCard
+      command="npm run dev -- recommend --project . --export csv --out recommendations.csv"
+      lines={[
+        'Exported 5 recommendations to recommendations.csv',
+        'Also available: --export md --out recommendations.md'
+      ]}
+      tone="success"
+    />
+  </Layout>
+);
+
+const SceneAssessInstall: React.FC = () => (
+  <Layout>
+    <TitleBlock title="7) Risk Assessment and Install Gates" subtitle="Block-by-default for high risk" />
+    <TerminalCard
+      command="npm run dev -- install --id mcp:remote-browser --yes"
+      lines={[
+        'Blocked by security policy (high, score=59)',
+        'Use --override-risk for explicit acceptance'
+      ]}
+      tone="danger"
+    />
+  </Layout>
+);
+
+const SceneSecurityOps: React.FC = () => (
+  <Layout>
+    <TitleBlock title="8) Ongoing Security Operations" subtitle="Whitelist verify + quarantine automation" />
+    <TerminalCard
+      command="npm run whitelist:verify"
+      lines={[
+        'reportPath: data/security-reports/YYYY-MM-DD/report.json',
+        'failed: 1',
+        'npm run quarantine:apply -- --report <reportPath>'
+      ]}
+      tone="warn"
+    />
+  </Layout>
+);
+
+const SceneCI: React.FC = () => (
+  <Layout>
+    <TitleBlock title="9) CI and Compliance" subtitle="CodeQL, dependency review, secrets, Trivy, SBOM" />
+    <TerminalCard
+      command="GitHub Actions"
+      lines={[
+        'CI (Node 18/20) + policy verification',
+        'Security / CodeQL',
+        'Security / Dependency Review',
+        'Security / Secrets (gitleaks)',
+        'Security / SBOM + Trivy'
+      ]}
+      tone="success"
+    />
+  </Layout>
+);
+
+const SceneOutro: React.FC = () => (
+  <Layout>
+    <TitleBlock title="Framework Ready for Any Project" subtitle="Simple onboarding, rich CLI UX, minimal risk operations" />
+    <TerminalCard
+      command="npm run top -- --limit 3"
+      lines={[
+        'Run top picks, inspect details, then install safely.',
+        'Repository: github.com/amitrintzler/skills-and-mcps'
+      ]}
+      tone="success"
+    />
+  </Layout>
+);
 
 export const ExplainerVideo: React.FC = () => {
+  const scenes: Array<React.FC> = [
+    SceneIntro,
+    SceneInit,
+    SceneDoctor,
+    SceneSync,
+    SceneBrowse,
+    SceneRecommend,
+    SceneExport,
+    SceneAssessInstall,
+    SceneSecurityOps,
+    SceneCI,
+    SceneOutro
+  ];
+
   return (
-    <AbsoluteFill style={{ backgroundColor: colors.bg }}>
-      {/* 1. Problem (0-12s) */}
-      <Sequence from={0} durationInFrames={360}>
-        <TransitionWrapper duration={360}>
-          <Scene1_Problem />
-        </TransitionWrapper>
-      </Sequence>
-
-      {/* 2. Solution (12-28s) -> Starts at 360 */}
-      <Sequence from={360} durationInFrames={480}>
-        <TransitionWrapper duration={480}>
-          <Scene2_Solution />
-        </TransitionWrapper>
-      </Sequence>
-
-      {/* 3. Key Benefit 1: Recommendations (28-45s) -> Starts at 840 */}
-      <Sequence from={840} durationInFrames={510}>
-        <TransitionWrapper duration={510}>
-          <Scene3_Recommendations />
-        </TransitionWrapper>
-      </Sequence>
-
-      {/* 4. Key Benefit 2: Security (45-62s) -> Starts at 1350 */}
-      <Sequence from={1350} durationInFrames={510}>
-        <TransitionWrapper duration={510}>
-          <Scene4_Security />
-        </TransitionWrapper>
-      </Sequence>
-
-      {/* 5. Key Benefit 3: Trust (62-78s) -> Starts at 1860 */}
-      <Sequence from={1860} durationInFrames={480}>
-        <TransitionWrapper duration={480}>
-          <Scene5_Trust />
-        </TransitionWrapper>
-      </Sequence>
-
-      {/* 6. Outcome / CTA (78-90s) -> Starts at 2340 */}
-      <Sequence from={2340} durationInFrames={360}>
-        <TransitionWrapper duration={360}>
-          <Scene6_CTA />
-        </TransitionWrapper>
-      </Sequence>
-      
-      {/* Background Audio (Optional placeholder) */}
-      {/* <Audio src={staticFile("background-music.mp3")} /> */}
+    <AbsoluteFill style={{ backgroundColor: palette.bg }}>
+      {scenes.map((Scene, index) => {
+        const from = index * sceneDuration;
+        return (
+          <Sequence key={from} from={from} durationInFrames={sceneDuration}>
+            <FadeScene from={from} duration={sceneDuration}>
+              <Scene />
+            </FadeScene>
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };
 
-// --- Remotion Root (Optional, if you need to register it here) ---
-// In a standard Remotion project, this would be in src/Root.tsx
-/*
-import { Composition } from 'remotion';
-
-export const RemotionRoot: React.FC = () => {
-  return (
-    <>
-      <Composition
-        id="ExplainerVideo"
-        component={ExplainerVideo}
-        durationInFrames={2700}
-        fps={30}
-        width={1920}
-        height={1080}
-      />
-    </>
-  );
-};
-*/
+export const walkthroughDurationInFrames = sceneDuration * 11;

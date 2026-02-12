@@ -29,10 +29,10 @@
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#how-to-use-this-cli">How To Use</a> •
-  <a href="#where-is-the-video">Where Is The Video</a> •
+  <a href="#video-walkthrough">Video Walkthrough</a> •
   <a href="#full-cli-capability-map">CLI Map</a> •
   <a href="#end-to-end-use-cases-with-screenshots">Use Cases</a> •
-  <a href="#full-remotion-walkthrough-video">Video Walkthrough</a> •
+  <a href="#full-remotion-walkthrough-video">Video Production</a> •
   <a href="#ci-and-security-gates">Security</a>
 </p>
 
@@ -184,19 +184,16 @@ npm run sync
 npm run dev -- recommend --project . --only-safe --sort trust --limit 10
 ```
 
-## Where Is The Video
+## Video Walkthrough
 
-The walkthrough video is expected at:
-- `out/framework-walkthrough.mp4`
+Direct video link:
+- https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4
 
-How to generate it locally:
+<video controls width="100%" preload="metadata" src="https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4">
+  Your browser does not support embedded video playback.
+</video>
 
-```bash
-npm run video:preview
-npm run video:render
-```
-
-If the file does not exist yet, it means render has not been run successfully in your environment.
+If the player does not render in your viewer, use the direct link above.
 
 ---
 
@@ -329,7 +326,7 @@ If render fails, check:
 - Remotion dependency versions are aligned.
 - Headless Chrome download/availability is allowed on your machine/network.
 
-### Embedded video block (renders when the MP4 exists)
+### Embedded video block
 
 Direct link:
 - https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4
