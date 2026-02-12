@@ -21,7 +21,7 @@ const sceneCount = 11;
 const FadeScene: React.FC<{ duration: number; children: React.ReactNode }> = ({ duration, children }) => {
   const local = useCurrentFrame();
   const fade = Math.min(24, Math.floor(duration * 0.1));
-  const opacity = interpolate(local, [0, fade, duration - fade, duration], [0, 1, 1, 0], {
+  const opacity = interpolate(local, [0, fade, duration], [0, 1, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp'
   });
@@ -201,28 +201,29 @@ const SceneShell: React.FC<{
 const SceneIntro: React.FC = () => (
   <SceneShell
     sceneNumber={1}
-    title="Complete Framework Overview"
-    subtitle="One operating layer for discovery, trust-first ranking, and secure install paths"
-    kpis={['4 ecosystem kinds', 'Daily sync + security checks', 'Trust-first scoring', 'Blocking risk gates']}
+    title="Live CLI Session: Verified End-to-End"
+    subtitle="Real commands and outputs captured from this repository runtime"
+    kpis={['about ✓', 'doctor ✓/fail gate', 'recommend ✓', 'sync dry-run ✓']}
     left={
       <TerminalBlock
         command="npm run about"
         lines={[
           'skills-and-mcps v0.1.0',
-          'Kinds: skill, mcp, claude-plugin, copilot-extension',
-          'Default policy: official sources only',
-          'Output modes: table | json | csv | md'
+          'Public Skills + MCP security recommendation framework',
+          'Scope: skills, MCP servers, Claude plugins, Copilot extensions',
+          'Ranking: trust-first (fit + trust - risk penalties + freshness bonus)',
+          'Sources: official-first provider registries with local fallback'
         ]}
       />
     }
     right={
       <BulletBlock
-        title="What this walkthrough proves"
+        title="Session proof points"
         items={[
-          'Any project can onboard in minutes with init + doctor.',
-          'Ranking combines fit, provenance, maintenance, adoption, and risk.',
-          'Install paths are gated by security tiers and policy.',
-          'CI continuously validates catalog integrity and supply-chain safety.'
+          'Catalog status reports 6 loaded items across 4 kinds.',
+          'Doctor now hard-fails when skill.sh is not installed.',
+          'Recommendations return trust/risk tables and safe filters.',
+          'Risk assessment correctly blocks high-risk installs.'
         ]}
       />
     }
@@ -268,31 +269,31 @@ const SceneDoctor: React.FC = () => (
   <SceneShell
     sceneNumber={3}
     title="2) Doctor Diagnostics"
-    subtitle="Fast environment validation before running catalog operations"
+    subtitle="Real output with required skill.sh enforcement"
     kpis={['Pass/Warn/Fail summary', 'CLI dependency checks', 'Catalog freshness checks', 'Actionable fixes']}
     left={
       <TerminalBlock
         command="npm run doctor"
-        tone="warn"
+        tone="danger"
         lines={[
-          'gh                 pass   installed and authenticated',
-          'Node version       pass   22.x',
-          'skill.sh           warn   missing (install optional)',
-          'Catalog            pass   items loaded',
-          'Sync freshness     pass   no stale registries'
+          'skill.sh           fail   skill.sh not found',
+          'gh                 pass   gh available',
+          'Node version       pass   Node 22.16.0',
+          'Catalog            pass   6 items loaded',
+          'Hint: Resolve failing checks before installation workflows.'
         ]}
       />
     }
     right={
       <BulletBlock
-        title="Recommended fixes if warnings exist"
+        title="Required action"
         items={[
-          'Install missing binaries only for flows you use.',
-          'Run sync if catalog or freshness checks fail.',
-          'Use strict posture in production environments.',
-          'Add doctor in CI preflight for operator confidence.'
+          'Install skill.sh and verify with skill.sh --version.',
+          'Run doctor again until all required checks pass.',
+          'Keep doctor as a preflight in team scripts/CI.',
+          'Install command preflight also enforces binary presence.'
         ]}
-        tone="warn"
+        tone="danger"
       />
     }
     footer={['Command latency: seconds', 'Human-readable by default', 'Machine parsing available via json']}
@@ -307,13 +308,13 @@ const SceneSync: React.FC = () => (
     kpis={['Remote + local fallback', 'Adapter-based mapping', 'Stable ID merge', 'Dual-write compatibility']}
     left={
       <TerminalBlock
-        command="npm run dev -- sync --kind mcp,skill,claude-plugin,copilot-extension"
+        command="npm run sync -- --dry-run"
         lines={[
-          'community-skills-index        fetched=2 merged=2',
-          'public-mcp-directory          fetched=2 merged=2',
-          'official-claude-plugins       fetched=1 merged=1',
-          'official-copilot-extensions   fetched=1 merged=1',
-          'saved data/catalog/items.json + legacy split outputs'
+          'community-skills-index (skill) entries=2 remote=yes',
+          'public-mcp-directory (mcp) entries=2 remote=yes',
+          'official-claude-plugins (claude-plugin) entries=1 remote=yes',
+          'official-copilot-extensions (copilot-extension) entries=1 remote=yes',
+          'Hint: Run without --dry-run to persist synced catalogs.'
         ]}
       />
     }
@@ -340,26 +341,24 @@ const SceneBrowse: React.FC = () => (
     kpis={['Kind/provider filters', 'Search by capability', 'Detailed item view', 'Top picks by context']}
     left={
       <TerminalBlock
-        command="npm run list -- --kind mcp --provider mcp --limit 4"
+        command="npm run list -- --kind mcp --limit 5"
         lines={[
-          'ID                                 KIND  PROVIDER  RISK   BLOCKED',
-          'mcp:filesystem                     mcp   mcp       low    false',
-          'mcp:postgres-observability         mcp   mcp       medium false',
-          'mcp:remote-browser                 mcp   mcp       high   true',
+          'ID                                TYPE  PROVIDER  RISK      BLOCKED',
+          'mcp:filesystem                    mcp   mcp       low(10)   false',
+          'mcp:remote-browser                mcp   mcp       high(59)  true',
           'Tip: npm run show -- --id mcp:filesystem'
         ]}
       />
     }
     right={
       <TerminalBlock
-        command="npm run search -- security && npm run top -- --project . --limit 3"
+        command="npm run search -- security && npm run show -- --id mcp:filesystem"
         tone="info"
         lines={[
-          'search results: skill:secure-prompting, copilot-extension:repo-security',
-          'top picks for project:',
-          '1) mcp:filesystem',
-          '2) skill:secure-prompting',
-          '3) copilot-extension:repo-security'
+          'copilot-extension:repo-security  match=140',
+          'skill:secure-prompting           match=30',
+          'show output includes: provider=mcp, transport=stdio,',
+          'risk.tier=low, policyStatus.approvedInWhitelist=true'
         ]}
       />
     }
@@ -375,13 +374,13 @@ const SceneRecommend: React.FC = () => (
     kpis={['rankScore + breakdown', 'blocked + reason flags', 'Sort and filter controls', 'Safe-mode recommendations']}
     left={
       <TerminalBlock
-        command="npm run dev -- recommend --project . --only-safe --sort trust --limit 5"
+        command="npm run recommend -- --project . --only-safe --sort trust --limit 5"
         tone="success"
         lines={[
-          'ID                                   RANK  TRUST  FIT   RISK   BLOCKED',
-          'mcp:filesystem                       51.7  41.8   72.0  low    false',
-          'skill:secure-prompting               50.9  37.8   69.0  low    false',
-          'copilot-extension:repo-security      50.6  38.6   63.0  low    false'
+          'mcp:filesystem                    rank=51.7 trust=41.8 low(10) false',
+          'copilot-extension:repo-security   rank=50.6 trust=38.6 low(0)  false',
+          'skill:secure-prompting            rank=50.9 trust=37.8 low(0)  false',
+          'claude-plugin:workspace-ops       rank=42.6 trust=37.2 low(0)  false'
         ]}
       />
     }
@@ -440,9 +439,10 @@ const SceneAssessInstall: React.FC = () => (
         command="npm run dev -- assess --id mcp:remote-browser"
         tone="warn"
         lines={[
-          'id=mcp:remote-browser',
-          'riskScore=59 riskTier=high blocked=true',
-          'reasons: remote exec surface, low provenance confidence'
+          'id: mcp:remote-browser',
+          'riskScore: 59',
+          'riskTier: high',
+          'scanner findings: vuln=1 suspicious=2 injection=1 exfiltration=1'
         ]}
       />
     }
@@ -451,9 +451,9 @@ const SceneAssessInstall: React.FC = () => (
         command="npm run dev -- install --id mcp:remote-browser --yes"
         tone="danger"
         lines={[
-          'Install blocked by security policy.',
+          'Blocked by security policy (high, score=59).',
           'Use --override-risk only with explicit acceptance.',
-          'Successful installs are written to data/security-reports/audits/'
+          'If installer is skill.sh, missing binary also fails preflight.'
         ]}
       />
     }
@@ -528,17 +528,18 @@ const SceneOutro: React.FC = () => (
   <SceneShell
     sceneNumber={11}
     title="Framework Ready for Real Projects"
-    subtitle="Discover, evaluate, and install with confidence at scale"
+    subtitle="Real usage validated: command flow, policy gates, and outputs"
     kpis={['Simple onboarding', 'Rich CLI visualization', 'Trust-first ranking', 'Production security gates']}
     left={
       <TerminalBlock
-        command="npm run top -- --project . --limit 3"
+        command="Operator flow (real session)"
         tone="success"
         lines={[
-          '1) mcp:filesystem',
-          '2) skill:secure-prompting',
-          '3) copilot-extension:repo-security',
-          'Next: show -> assess -> install'
+          '1) npm run about',
+          '2) npm run doctor',
+          '3) npm run list/search/show',
+          '4) npm run recommend',
+          '5) npm run dev -- assess/install'
         ]}
       />
     }
