@@ -1,8 +1,9 @@
 import fs from 'node:fs/promises';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { loadWhitelist, QUARANTINE_PATH, WHITELIST_PATH } from '../../src/catalog/repository.js';
+import { syncCatalogs } from '../../src/catalog/sync.js';
 import { installWithSkillSh } from '../../src/install/skillsh.js';
 import { detectProjectSignals } from '../../src/recommendation/project-analysis.js';
 import { recommend } from '../../src/recommendation/engine.js';
@@ -27,6 +28,17 @@ afterEach(async () => {
   }
   if (quarantineBackup) {
     await fs.writeFile(QUARANTINE_PATH, quarantineBackup, 'utf8');
+  }
+});
+
+beforeAll(async () => {
+  const prevOffline = process.env.SKILLS_MCPS_SYNC_OFFLINE;
+  process.env.SKILLS_MCPS_SYNC_OFFLINE = '1';
+  await syncCatalogs(process.env.SKILLS_MCPS_SYNC_TODAY || '2026-02-12');
+  if (prevOffline === undefined) {
+    delete process.env.SKILLS_MCPS_SYNC_OFFLINE;
+  } else {
+    process.env.SKILLS_MCPS_SYNC_OFFLINE = prevOffline;
   }
 });
 

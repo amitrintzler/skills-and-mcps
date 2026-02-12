@@ -30,12 +30,24 @@ export async function resolveRegistryEntries(
     return { entries: registry.entries, source: 'local' };
   }
 
+  if (registry.remote.authEnv) {
+    const token = process.env[registry.remote.authEnv];
+    if (!token && registry.entries.length > 0) {
+      logger.info(
+        `Remote registry ${registry.id} requires ${registry.remote.authEnv}; using ${registry.entries.length} local fallback entries`
+      );
+      return { entries: registry.entries, source: 'local' };
+    }
+  }
+
   try {
     const parsed = await fetchRemoteRegistryEntries(registry, options, fetchImpl);
 
     if (parsed.length === 0 && registry.entries.length > 0) {
-      logger.warn(
-        `Remote registry ${registry.id} returned no entries; using ${registry.entries.length} local fallback entries`
+      const level = options.updatedSince ? 'info' : 'warn';
+      const reason = options.updatedSince ? 'returned no updates' : 'returned no entries';
+      logger[level](
+        `Remote registry ${registry.id} ${reason}; using ${registry.entries.length} local fallback entries`
       );
       return { entries: registry.entries, source: 'local' };
     }
@@ -44,8 +56,7 @@ export async function resolveRegistryEntries(
   } catch (error) {
     if (registry.remote.fallbackToLocal && registry.entries.length > 0) {
       logger.warn(
-        `Remote registry ${registry.id} fetch failed; using ${registry.entries.length} local fallback entries`,
-        error
+        `Remote registry ${registry.id} fetch failed (${summarizeError(error)}); using ${registry.entries.length} local fallback entries`
       );
       return { entries: registry.entries, source: 'local' };
     }
@@ -208,4 +219,11 @@ function buildRemoteUrl(
   }
 
   return url.toString();
+}
+
+function summarizeError(error: unknown): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+  return 'unknown error';
 }

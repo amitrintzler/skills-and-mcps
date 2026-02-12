@@ -159,6 +159,7 @@ flowchart LR
 npm install
 npm run init
 npm run doctor
+npm run scan -- --project . --format table
 npm run sync
 npm run top -- --limit 5
 ```
@@ -166,7 +167,14 @@ npm run top -- --limit 5
 For current project recommendations:
 
 ```bash
-npm run recommend -- --project . --only-safe --sort trust --limit 10
+npm run recommend -- --project . --only-safe --sort trust --limit 10 --explain-scan
+```
+
+Optional LLM enrichment (requires `OPENAI_API_KEY`):
+
+```bash
+npm run scan -- --project . --llm
+npm run recommend -- --project . --llm --explain-scan
 ```
 
 ## How To Use This CLI
@@ -185,10 +193,13 @@ npm run doctor
 # 3) Sync latest catalog data
 npm run sync
 
-# 4) Discover best options for your current repo
+# 4) Scan your repository deeply (archetype + capability inference)
+npm run scan -- --project . --format table
+
+# 5) Discover best options for your current repo
 npm run top -- --project . --limit 5
 
-# 5) Inspect and install safely
+# 6) Inspect and install safely
 npm run show -- --id mcp:filesystem
 npm run assess -- --id mcp:filesystem
 npm run install:item -- --id mcp:filesystem --yes
@@ -198,7 +209,8 @@ Recommended daily usage:
 
 ```bash
 npm run sync
-npm run recommend -- --project . --only-safe --sort trust --limit 10
+npm run scan -- --project . --format table
+npm run recommend -- --project . --only-safe --sort trust --limit 10 --explain-scan
 ```
 
 ## Video Walkthrough
@@ -226,12 +238,15 @@ Direct MP4 link:
 ### Catalog discovery and inspection
 - `npm run list -- --kind mcp --limit 10`
 - `npm run search -- security`
+- `npm run scan -- --project . --format table`
+- `npm run scan -- --project . --format json --out scan-report.json`
 - `npm run show -- --id mcp:filesystem`
 - `npm run top -- --project . --limit 5`
 
 ### Recommendation and export
 - `npm run recommend -- --project . --format table`
-- `npm run recommend -- --project . --only-safe --sort trust --limit 10`
+- `npm run recommend -- --project . --only-safe --sort trust --limit 10 --explain-scan`
+- `npm run recommend -- --project . --llm --explain-scan`
 - `npm run recommend -- --project . --export csv --out recommendations.csv`
 - `npm run recommend -- --project . --export md --out recommendations.md`
 

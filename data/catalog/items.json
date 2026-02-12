@@ -15,7 +15,7 @@
       "general"
     ],
     "source": "official-claude-plugins",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "install": {
       "kind": "manual",
       "instructions": "Enable from Claude plugin catalog."
@@ -51,7 +51,7 @@
       "python"
     ],
     "source": "official-copilot-extensions",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "install": {
       "kind": "gh-cli",
       "target": "copilot-extension",
@@ -89,7 +89,7 @@
       "container"
     ],
     "source": "public-mcp-directory",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "transport": "stdio",
     "authModel": "none",
     "install": {
@@ -127,7 +127,7 @@
       "node"
     ],
     "source": "public-mcp-directory",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "transport": "http",
     "authModel": "api_key",
     "install": {
@@ -165,7 +165,7 @@
       "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "install": {
       "kind": "skill.sh",
       "target": "fast-web-scrape",
@@ -201,7 +201,7 @@
       "general"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "install": {
       "kind": "skill.sh",
       "target": "secure-prompting",

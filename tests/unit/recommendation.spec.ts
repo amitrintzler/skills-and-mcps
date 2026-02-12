@@ -5,7 +5,15 @@ import { recommend } from '../../src/recommendation/engine.js';
 describe('recommend', () => {
   it('returns ranked results with risk metadata and score breakdown', async () => {
     const ranked = await recommend({
-      projectSignals: { stack: ['node'], compatibilityTags: ['node'] },
+      projectSignals: {
+        stack: ['node'],
+        compatibilityTags: ['node'],
+        inferredCapabilities: [],
+        scanEvidence: [],
+        inferredArchetype: 'node-service',
+        inferenceConfidence: 70,
+        archetypeScores: [{ name: 'node-service', score: 9 }]
+      },
       requirements: {
         useCase: 'agent',
         stack: ['node'],
@@ -24,7 +32,15 @@ describe('recommend', () => {
 
   it('supports filtering by kind', async () => {
     const ranked = await recommend({
-      projectSignals: { stack: ['node'], compatibilityTags: ['node'] },
+      projectSignals: {
+        stack: ['node'],
+        compatibilityTags: ['node'],
+        inferredCapabilities: [],
+        scanEvidence: [],
+        inferredArchetype: 'node-service',
+        inferenceConfidence: 70,
+        archetypeScores: [{ name: 'node-service', score: 9 }]
+      },
       requirements: {
         useCase: 'agent',
         stack: ['node'],

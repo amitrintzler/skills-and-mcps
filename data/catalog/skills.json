@@ -13,7 +13,7 @@
       "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "install": {
       "kind": "skill.sh",
       "target": "fast-web-scrape",
@@ -49,7 +49,7 @@
       "general"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "install": {
       "kind": "skill.sh",
       "target": "secure-prompting",

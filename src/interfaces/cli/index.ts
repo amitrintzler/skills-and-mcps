@@ -57,6 +57,9 @@ export async function runCli(argv: string[]): Promise<void> {
     case 'search':
       await handleSearch(rest);
       return;
+    case 'scan':
+      await handleScan(rest);
+      return;
     case 'top':
       await handleTop(rest);
       return;
@@ -412,14 +415,78 @@ async function handleSearch(args: string[]): Promise<void> {
   printHint('Use `show --id <catalog-id>` for full detail.');
 }
 
+async function handleScan(args: string[]): Promise<void> {
+  const project = readFlag(args, '--project') ?? '.';
+  const format = readFlag(args, '--format') ?? 'table';
+  const llm = hasFlag(args, '--llm');
+  const out = readFlag(args, '--out');
+
+  const scan = await detectProjectSignals(path.resolve(project), { llm });
+  const payload = {
+    project: path.resolve(project),
+    inferredArchetype: scan.inferredArchetype,
+    inferenceConfidence: scan.inferenceConfidence,
+    stack: scan.stack,
+    compatibilityTags: scan.compatibilityTags,
+    inferredCapabilities: scan.inferredCapabilities,
+    archetypeScores: scan.archetypeScores,
+    evidence: scan.scanEvidence
+  };
+
+  if (out) {
+    await fs.writeFile(path.resolve(out), `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+    console.log(`Wrote scan report to ${path.resolve(out)}`);
+  }
+
+  if (format === 'json') {
+    printJson(payload);
+    return;
+  }
+
+  console.log('Repository Scan');
+  console.log(`Archetype: ${scan.inferredArchetype}`);
+  console.log(`Confidence: ${scan.inferenceConfidence}%`);
+  console.log(`Stack: ${scan.stack.join(', ') || 'none'}`);
+  console.log(`Compatibility tags: ${scan.compatibilityTags.join(', ') || 'none'}`);
+  console.log(`Inferred capabilities: ${scan.inferredCapabilities.join(', ') || 'none'}`);
+  console.log('');
+
+  if (scan.archetypeScores.length > 0) {
+    console.log(
+      renderTable(
+        [
+          { key: 'name', header: 'ARCHETYPE', width: 36 },
+          { key: 'score', header: 'SCORE', width: 8 }
+        ],
+        scan.archetypeScores.slice(0, 8).map((row) => ({
+          name: row.name,
+          score: String(row.score)
+        }))
+      )
+    );
+    console.log('');
+  }
+
+  if (scan.scanEvidence.length > 0) {
+    console.log('Evidence');
+    scan.scanEvidence.slice(0, 16).forEach((line) => console.log(`- ${line}`));
+    if (scan.scanEvidence.length > 16) {
+      console.log(`- ...and ${scan.scanEvidence.length - 16} more`);
+    }
+  }
+
+  printHint('Use `recommend --project . --explain-scan` to turn scan signals into ranked recommendations.');
+}
+
 async function handleTop(args: string[]): Promise<void> {
   const project = readFlag(args, '--project') ?? '.';
   const requirementsFile = readFlag(args, '--requirements');
   const kinds = readKinds(args);
   const limit = readLimit(args, 10) ?? 10;
+  const llm = hasFlag(args, '--llm');
 
   const [projectSignals, requirements] = await Promise.all([
-    detectProjectSignals(path.resolve(project)),
+    detectProjectSignals(path.resolve(project), { llm }),
     loadRequirementsProfile(requirementsFile)
   ]);
 
@@ -463,11 +530,34 @@ async function handleRecommend(args: string[]): Promise<void> {
   const sort = readSort(args);
   const exportFormat = readFlag(args, '--export');
   const exportPath = readFlag(args, '--out');
+  const explainScan = hasFlag(args, '--explain-scan');
+  const llm = hasFlag(args, '--llm');
 
   const [projectSignals, requirements] = await Promise.all([
-    detectProjectSignals(path.resolve(project)),
+    detectProjectSignals(path.resolve(project), { llm }),
     loadRequirementsProfile(requirementsFile)
   ]);
+
+  if (explainScan) {
+    const previewEvidence = projectSignals.scanEvidence.slice(0, 12);
+    console.log('Project Scan');
+    console.log(
+      `- archetype: ${projectSignals.inferredArchetype} (${projectSignals.inferenceConfidence}% confidence)`
+    );
+    console.log(`- stack: ${projectSignals.stack.join(', ') || 'none'}`);
+    console.log(`- compatibility tags: ${projectSignals.compatibilityTags.join(', ') || 'none'}`);
+    console.log(
+      `- inferred capabilities: ${projectSignals.inferredCapabilities.join(', ') || 'none'}`
+    );
+    if (previewEvidence.length > 0) {
+      console.log('- evidence:');
+      previewEvidence.forEach((line) => console.log(`  - ${line}`));
+      if (projectSignals.scanEvidence.length > previewEvidence.length) {
+        console.log(`  - ...and ${projectSignals.scanEvidence.length - previewEvidence.length} more`);
+      }
+    }
+    console.log('');
+  }
 
   let ranked = await recommend({ projectSignals, requirements, kinds });
 
@@ -712,9 +802,10 @@ function printHelp(): void {
   logger.info('  sync [--kind skill,mcp,claude-plugin,copilot-extension] [--dry-run]');
   logger.info('  list [--kind ...] [--provider ...] [--risk-tier low|medium|high|critical] [--blocked true|false] [--search q] [--limit n] [--sort name|risk|trust] [--format json|table]');
   logger.info('  search <query>');
+  logger.info('  scan [--project .] [--format table|json] [--out scan-report.json] [--llm]');
   logger.info('  show --id <catalog-id>');
-  logger.info('  top [--project .] [--requirements requirements.yml] [--kind ...] [--limit n]');
-  logger.info('  recommend --project . --requirements requirements.yml --format json|table [--kind ...] [--provider ...] [--limit n] [--sort score|trust|risk|fit|name] [--only-safe] [--export csv|md --out file]');
+  logger.info('  top [--project .] [--requirements requirements.yml] [--kind ...] [--limit n] [--llm]');
+  logger.info('  recommend --project . --requirements requirements.yml --format json|table [--kind ...] [--provider ...] [--limit n] [--sort score|trust|risk|fit|name] [--only-safe] [--explain-scan] [--llm] [--export csv|md --out file]');
   logger.info('  assess --id <catalog-id>');
   logger.info('  install --id <catalog-id> [--yes] [--override-risk]');
   logger.info('  whitelist verify');

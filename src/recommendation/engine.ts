@@ -45,12 +45,17 @@ function rankCandidate(
   quarantinedIds: Set<string>
 ): Recommendation {
   const assessment = buildAssessment(candidate, securityPolicy);
+  const effectiveRequiredCapabilities = dedupe([
+    ...requirements.requiredCapabilities,
+    ...projectSignals.inferredCapabilities
+  ]);
 
   const compatibilityScore = overlapScore(candidate.compatibility, [
     ...projectSignals.compatibilityTags,
     ...requirements.stack
   ]);
-  const capabilityScore = overlapScore(candidate.capabilities, requirements.requiredCapabilities);
+  const capabilityScore = overlapScore(candidate.capabilities, effectiveRequiredCapabilities);
+  const inferredCapabilityMatches = countMatches(candidate.capabilities, projectSignals.inferredCapabilities);
 
   const fitScore =
     compatibilityScore * (rankingPolicy.weights.compatibility / 100) +
@@ -73,8 +78,11 @@ function rankCandidate(
   const rankScore = Math.max(0, Math.min(100, rawRank));
 
   const fitReasons = [
+    `Project archetype: ${projectSignals.inferredArchetype} (${projectSignals.inferenceConfidence}% confidence)`,
     `Compatibility overlap: ${compatibilityScore.toFixed(1)}`,
     `Capability coverage: ${capabilityScore.toFixed(1)}`,
+    `Inferred capability matches: ${inferredCapabilityMatches}`,
+    `Repo evidence signals: ${projectSignals.scanEvidence.length}`,
     `Maintenance signal: ${candidate.maintenanceSignal}`,
     `Provenance signal: ${candidate.provenanceSignal}`,
     `Adoption signal: ${candidate.adoptionSignal}`
@@ -136,6 +144,19 @@ function overlapScore(left: string[], right: string[]): number {
   const rightSet = new Set(right.map((value) => value.toLowerCase()));
   const matches = left.filter((value) => rightSet.has(value.toLowerCase())).length;
   return (matches / Math.max(left.length, right.length)) * 100;
+}
+
+function countMatches(left: string[], right: string[]): number {
+  if (left.length === 0 || right.length === 0) {
+    return 0;
+  }
+
+  const rightSet = new Set(right.map((value) => value.toLowerCase()));
+  return left.filter((value) => rightSet.has(value.toLowerCase())).length;
+}
+
+function dedupe(values: string[]): string[] {
+  return Array.from(new Set(values.map((value) => value.trim()).filter((value) => value.length > 0)));
 }
 
 function round(value: number): number {

@@ -15,7 +15,7 @@
       "container"
     ],
     "source": "public-mcp-directory",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "transport": "stdio",
     "authModel": "none",
     "install": {
@@ -53,7 +53,7 @@
       "node"
     ],
     "source": "public-mcp-directory",
-    "lastSeenAt": "2026-02-10",
+    "lastSeenAt": "2026-02-12",
     "transport": "http",
     "authModel": "api_key",
     "install": {
