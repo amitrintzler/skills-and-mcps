@@ -215,17 +215,9 @@ npm run recommend -- --project . --only-safe --sort trust --limit 10 --explain-s
 
 ## Video Walkthrough
 
-<video
-  src="https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4"
-  controls
-  playsinline
-  width="960"
-  poster="https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough-preview.gif"
->
-  Your browser does not support the video tag.
-</video>
+[![Framework Walkthrough Preview](out/framework-walkthrough-preview.gif)](https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4)
 
-Fallback link: [framework-walkthrough.mp4](https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4)
+Video file: [framework-walkthrough.mp4](https://raw.githubusercontent.com/amitrintzler/skills-and-mcps/main/out/framework-walkthrough.mp4)
 
 ---
 
