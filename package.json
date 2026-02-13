@@ -26,6 +26,7 @@
     "status": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts status",
     "list": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts list",
     "search": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts search",
+    "explain": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts explain",
     "scan": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts scan",
     "show": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts show",
     "top": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts top",

@@ -2,12 +2,14 @@ import path from 'node:path';
 
 import { readJsonFile } from '../lib/json.js';
 import {
+  ItemInsightsFileSchema,
   ProvidersFileSchema,
   RankingPolicySchema,
   RecommendationWeightsSchema,
   RegistriesFileSchema,
   SecurityPolicySchema,
   type ProviderConfig,
+  type ItemInsight,
   type RankingPolicy,
   type Registry,
   type SecurityPolicy
@@ -18,6 +20,7 @@ const SECURITY_POLICY_PATH = path.resolve('config/security-policy.json');
 const RANKING_POLICY_PATH = path.resolve('config/ranking-policy.json');
 const RECOMMENDATION_WEIGHTS_PATH = path.resolve('config/recommendation-weights.json');
 const PROVIDERS_PATH = path.resolve('config/providers.json');
+const ITEM_INSIGHTS_PATH = path.resolve('config/item-insights.json');
 
 export async function loadRegistries(): Promise<Registry[]> {
   const raw = await readJsonFile<unknown>(REGISTRIES_PATH);
@@ -57,4 +60,10 @@ export async function loadProviders(): Promise<Map<string, ProviderConfig>> {
   const raw = await readJsonFile<unknown>(PROVIDERS_PATH);
   const parsed = ProvidersFileSchema.parse(raw);
   return new Map(parsed.providers.filter((provider) => provider.enabled).map((provider) => [provider.id, provider]));
+}
+
+export async function loadItemInsights(): Promise<Map<string, ItemInsight>> {
+  const raw = await readJsonFile<unknown>(ITEM_INSIGHTS_PATH);
+  const parsed = ItemInsightsFileSchema.parse(raw);
+  return new Map(parsed.insights.map((item) => [item.id, item]));
 }

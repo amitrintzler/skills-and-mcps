@@ -238,6 +238,8 @@ Direct MP4 link:
 ### Catalog discovery and inspection
 - `npm run list -- --kind mcp --limit 10`
 - `npm run search -- security`
+- `npm run explain -- --limit 20` 
+- `npm run explain -- --kind mcp --format json`
 - `npm run scan -- --project . --format table`
 - `npm run scan -- --project . --format json --out scan-report.json`
 - `npm run show -- --id mcp:filesystem`

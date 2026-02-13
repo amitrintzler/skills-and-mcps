@@ -37,6 +37,82 @@
           }
         },
         {
+          "id": "skill:ci-hardening",
+          "name": "CI Hardening",
+          "description": "Best-practice workflow hardening patterns for GitHub Actions and policy gates.",
+          "capabilities": ["automation", "security", "code-scanning"],
+          "compatibility": ["node", "github", "general"],
+          "install": { "kind": "skill.sh", "target": "ci-hardening", "args": [] },
+          "adoptionSignal": 82,
+          "maintenanceSignal": 85,
+          "provenanceSignal": 72,
+          "freshnessSignal": 76,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "skill:threat-modeling-lite",
+          "name": "Threat Modeling Lite",
+          "description": "Fast threat modeling workflow for repo-level security reviews.",
+          "capabilities": ["security", "guardrails", "dependency-audit"],
+          "compatibility": ["node", "python", "general"],
+          "install": { "kind": "skill.sh", "target": "threat-modeling-lite", "args": [] },
+          "adoptionSignal": 70,
+          "maintenanceSignal": 79,
+          "provenanceSignal": 68,
+          "freshnessSignal": 74,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "skill:release-readiness",
+          "name": "Release Readiness",
+          "description": "Release checklist automation with semver, changelog, and quality gates.",
+          "capabilities": ["automation", "guardrails", "search"],
+          "compatibility": ["node", "github", "general"],
+          "install": { "kind": "skill.sh", "target": "release-readiness", "args": [] },
+          "adoptionSignal": 74,
+          "maintenanceSignal": 80,
+          "provenanceSignal": 66,
+          "freshnessSignal": 72,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "skill:docs-automation",
+          "name": "Docs Automation",
+          "description": "Generate and maintain technical docs from code and runtime outputs.",
+          "capabilities": ["automation", "search", "prompting"],
+          "compatibility": ["node", "python", "general"],
+          "install": { "kind": "skill.sh", "target": "docs-automation", "args": [] },
+          "adoptionSignal": 67,
+          "maintenanceSignal": 76,
+          "provenanceSignal": 60,
+          "freshnessSignal": 69,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
           "id": "skill:fast-web-scrape",
           "name": "Fast Web Scrape",
           "description": "High-throughput data extraction helpers for websites.",
@@ -90,7 +166,7 @@
           "description": "Access local files in read/write mode.",
           "transport": "stdio",
           "authModel": "none",
-          "capabilities": ["file-read", "file-write"],
+          "capabilities": ["file-read", "file-write", "search"],
           "compatibility": ["node", "python", "container"],
           "install": { "kind": "skill.sh", "target": "mcp-filesystem", "args": ["--transport", "stdio"] },
           "adoptionSignal": 84,
@@ -100,6 +176,111 @@
           "securitySignals": {
             "knownVulnerabilities": 0,
             "suspiciousPatterns": 1,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "mcp:github-actions-auditor",
+          "name": "GitHub Actions Auditor MCP",
+          "description": "Audit workflow permissions, unsafe patterns, and missing security controls.",
+          "transport": "http",
+          "authModel": "api_key",
+          "capabilities": ["security", "code-scanning", "automation"],
+          "compatibility": ["node", "github", "general"],
+          "install": { "kind": "skill.sh", "target": "mcp-gha-auditor", "args": ["--transport", "http"] },
+          "adoptionSignal": 77,
+          "maintenanceSignal": 82,
+          "provenanceSignal": 93,
+          "freshnessSignal": 78,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "mcp:dependency-intel",
+          "name": "Dependency Intel MCP",
+          "description": "Correlate package vulnerabilities, advisories, and upgrade guidance.",
+          "transport": "http",
+          "authModel": "api_key",
+          "capabilities": ["dependency-audit", "security", "search"],
+          "compatibility": ["node", "python", "general"],
+          "install": { "kind": "skill.sh", "target": "mcp-dependency-intel", "args": ["--transport", "http"] },
+          "adoptionSignal": 79,
+          "maintenanceSignal": 84,
+          "provenanceSignal": 92,
+          "freshnessSignal": 80,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "mcp:policy-as-code",
+          "name": "Policy-as-Code MCP",
+          "description": "Evaluate policy bundles against CI/CD and repository configuration.",
+          "transport": "stdio",
+          "authModel": "none",
+          "capabilities": ["guardrails", "security", "automation"],
+          "compatibility": ["node", "container", "general"],
+          "install": { "kind": "skill.sh", "target": "mcp-policy-as-code", "args": ["--transport", "stdio"] },
+          "adoptionSignal": 73,
+          "maintenanceSignal": 80,
+          "provenanceSignal": 90,
+          "freshnessSignal": 77,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "mcp:release-governance",
+          "name": "Release Governance MCP",
+          "description": "Check release readiness, versioning alignment, and changelog integrity.",
+          "transport": "stdio",
+          "authModel": "none",
+          "capabilities": ["guardrails", "automation", "search"],
+          "compatibility": ["node", "github", "general"],
+          "install": { "kind": "skill.sh", "target": "mcp-release-governance", "args": ["--transport", "stdio"] },
+          "adoptionSignal": 71,
+          "maintenanceSignal": 78,
+          "provenanceSignal": 89,
+          "freshnessSignal": 73,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "mcp:repo-observability",
+          "name": "Repository Observability MCP",
+          "description": "Track quality, reliability, and security trends from repo events.",
+          "transport": "http",
+          "authModel": "api_key",
+          "capabilities": ["search", "automation", "security"],
+          "compatibility": ["node", "github", "general"],
+          "install": { "kind": "skill.sh", "target": "mcp-repo-observability", "args": ["--transport", "http"] },
+          "adoptionSignal": 69,
+          "maintenanceSignal": 76,
+          "provenanceSignal": 88,
+          "freshnessSignal": 71,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
             "injectionFindings": 0,
             "exfiltrationSignals": 0,
             "integrityAlerts": 0
@@ -167,6 +348,63 @@
             "exfiltrationSignals": 0,
             "integrityAlerts": 0
           }
+        },
+        {
+          "id": "claude-plugin:repo-threat-review",
+          "name": "Repo Threat Review",
+          "description": "Threat-centric review assistant for pull requests and workflows.",
+          "capabilities": ["security", "guardrails", "code-scanning"],
+          "compatibility": ["claude", "github", "node"],
+          "install": { "kind": "manual", "instructions": "Enable from Claude plugin catalog." },
+          "adoptionSignal": 72,
+          "maintenanceSignal": 81,
+          "provenanceSignal": 97,
+          "freshnessSignal": 79,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "claude-plugin:incident-summarizer",
+          "name": "Incident Summarizer",
+          "description": "Build incident timelines and postmortem-ready summaries.",
+          "capabilities": ["search", "automation", "docs"],
+          "compatibility": ["claude", "general"],
+          "install": { "kind": "manual", "instructions": "Enable from Claude plugin catalog." },
+          "adoptionSignal": 68,
+          "maintenanceSignal": 77,
+          "provenanceSignal": 95,
+          "freshnessSignal": 75,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "claude-plugin:compliance-evidence",
+          "name": "Compliance Evidence Collector",
+          "description": "Collect reproducible evidence for audits and security attestations.",
+          "capabilities": ["security", "dependency-audit", "automation"],
+          "compatibility": ["claude", "general"],
+          "install": { "kind": "manual", "instructions": "Enable from Claude plugin catalog." },
+          "adoptionSignal": 70,
+          "maintenanceSignal": 79,
+          "provenanceSignal": 96,
+          "freshnessSignal": 78,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
         }
       ]
     },
@@ -202,6 +440,63 @@
           "maintenanceSignal": 75,
           "provenanceSignal": 97,
           "freshnessSignal": 72,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "copilot-extension:actions-guardian",
+          "name": "Actions Guardian",
+          "description": "Review workflows for least privilege, pinning, and dangerous patterns.",
+          "capabilities": ["security", "code-scanning", "automation"],
+          "compatibility": ["copilot", "github", "node"],
+          "install": { "kind": "gh-cli", "target": "copilot-extension", "args": ["install", "actions-guardian"] },
+          "adoptionSignal": 79,
+          "maintenanceSignal": 84,
+          "provenanceSignal": 98,
+          "freshnessSignal": 81,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "copilot-extension:sbom-advisor",
+          "name": "SBOM Advisor",
+          "description": "Generate SBOM action plans and remediation tasks from dependency risk.",
+          "capabilities": ["dependency-audit", "security", "search"],
+          "compatibility": ["copilot", "github", "node", "python"],
+          "install": { "kind": "gh-cli", "target": "copilot-extension", "args": ["install", "sbom-advisor"] },
+          "adoptionSignal": 76,
+          "maintenanceSignal": 82,
+          "provenanceSignal": 98,
+          "freshnessSignal": 80,
+          "securitySignals": {
+            "knownVulnerabilities": 0,
+            "suspiciousPatterns": 0,
+            "injectionFindings": 0,
+            "exfiltrationSignals": 0,
+            "integrityAlerts": 0
+          }
+        },
+        {
+          "id": "copilot-extension:release-gatekeeper",
+          "name": "Release Gatekeeper",
+          "description": "Automate release gate checks and version policy compliance.",
+          "capabilities": ["guardrails", "automation", "search"],
+          "compatibility": ["copilot", "github", "node"],
+          "install": { "kind": "gh-cli", "target": "copilot-extension", "args": ["install", "release-gatekeeper"] },
+          "adoptionSignal": 74,
+          "maintenanceSignal": 80,
+          "provenanceSignal": 97,
+          "freshnessSignal": 79,
           "securitySignals": {
             "knownVulnerabilities": 0,
             "suspiciousPatterns": 0,

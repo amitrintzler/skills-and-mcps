@@ -215,6 +215,19 @@ export const ProvidersFileSchema = z.object({
   providers: z.array(ProviderConfigSchema)
 });
 
+export const ItemInsightSchema = z.object({
+  id: z.string().min(1),
+  benefitSummary: z.string().min(1),
+  bestFor: z.array(z.string().min(1)).default([]),
+  whenToUse: z.array(z.string().min(1)).default([]),
+  tradeoffs: z.array(z.string().min(1)).default([]),
+  usageNotes: z.array(z.string().min(1)).default([])
+});
+
+export const ItemInsightsFileSchema = z.object({
+  insights: z.array(ItemInsightSchema)
+});
+
 export const RequirementsProfileSchema = z.object({
   useCase: z.string().default('general'),
   stack: z.array(z.string()).default([]),
@@ -267,6 +280,7 @@ export type SecurityPolicy = z.infer<typeof SecurityPolicySchema>;
 export type RankingPolicy = z.infer<typeof RankingPolicySchema>;
 export type RecommendationWeights = z.infer<typeof RecommendationWeightsSchema>;
 export type ProviderConfig = z.infer<typeof ProviderConfigSchema>;
+export type ItemInsight = z.infer<typeof ItemInsightSchema>;
 export type RequirementsProfile = z.infer<typeof RequirementsProfileSchema>;
 export type SecurityReport = z.infer<typeof SecurityReportSchema>;
 export type QuarantineEntry = z.infer<typeof QuarantineEntrySchema>;

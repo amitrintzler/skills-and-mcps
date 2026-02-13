@@ -1,5 +1,77 @@
 [
   {
+    "id": "skill:ci-hardening",
+    "kind": "skill",
+    "name": "CI Hardening",
+    "description": "Best-practice workflow hardening patterns for GitHub Actions and policy gates.",
+    "provider": "openai",
+    "capabilities": [
+      "automation",
+      "security",
+      "code-scanning"
+    ],
+    "compatibility": [
+      "node",
+      "github",
+      "general"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-12",
+    "install": {
+      "kind": "skill.sh",
+      "target": "ci-hardening",
+      "args": []
+    },
+    "adoptionSignal": 82,
+    "maintenanceSignal": 85,
+    "provenanceSignal": 72,
+    "freshnessSignal": 76,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "skill:docs-automation",
+    "kind": "skill",
+    "name": "Docs Automation",
+    "description": "Generate and maintain technical docs from code and runtime outputs.",
+    "provider": "openai",
+    "capabilities": [
+      "automation",
+      "search",
+      "prompting"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "general"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-12",
+    "install": {
+      "kind": "skill.sh",
+      "target": "docs-automation",
+      "args": []
+    },
+    "adoptionSignal": 67,
+    "maintenanceSignal": 76,
+    "provenanceSignal": 60,
+    "freshnessSignal": 69,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
     "id": "skill:fast-web-scrape",
     "kind": "skill",
     "name": "Fast Web Scrape",
@@ -33,6 +105,42 @@
     "metadata": {}
   },
   {
+    "id": "skill:release-readiness",
+    "kind": "skill",
+    "name": "Release Readiness",
+    "description": "Release checklist automation with semver, changelog, and quality gates.",
+    "provider": "openai",
+    "capabilities": [
+      "automation",
+      "guardrails",
+      "search"
+    ],
+    "compatibility": [
+      "node",
+      "github",
+      "general"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-12",
+    "install": {
+      "kind": "skill.sh",
+      "target": "release-readiness",
+      "args": []
+    },
+    "adoptionSignal": 74,
+    "maintenanceSignal": 80,
+    "provenanceSignal": 66,
+    "freshnessSignal": 72,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
     "id": "skill:secure-prompting",
     "kind": "skill",
     "name": "Secure Prompting",
@@ -59,6 +167,42 @@
     "maintenanceSignal": 83,
     "provenanceSignal": 75,
     "freshnessSignal": 60,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "skill:threat-modeling-lite",
+    "kind": "skill",
+    "name": "Threat Modeling Lite",
+    "description": "Fast threat modeling workflow for repo-level security reviews.",
+    "provider": "openai",
+    "capabilities": [
+      "security",
+      "guardrails",
+      "dependency-audit"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "general"
+    ],
+    "source": "community-skills-index",
+    "lastSeenAt": "2026-02-12",
+    "install": {
+      "kind": "skill.sh",
+      "target": "threat-modeling-lite",
+      "args": []
+    },
+    "adoptionSignal": 70,
+    "maintenanceSignal": 79,
+    "provenanceSignal": 68,
+    "freshnessSignal": 74,
     "securitySignals": {
       "knownVulnerabilities": 0,
       "suspiciousPatterns": 0,

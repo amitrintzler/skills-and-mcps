@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 
-import { loadRegistries, loadSecurityPolicy } from '../../config/runtime.js';
+import { loadItemInsights, loadRegistries, loadSecurityPolicy } from '../../config/runtime.js';
 import { syncCatalogs } from '../../catalog/sync.js';
 import { getStaleRegistries, loadSyncState } from '../../catalog/sync-state.js';
 import { loadCatalogItemById, loadCatalogItems, loadQuarantine, loadWhitelist } from '../../catalog/repository.js';
@@ -56,6 +56,9 @@ export async function runCli(argv: string[]): Promise<void> {
       return;
     case 'search':
       await handleSearch(rest);
+      return;
+    case 'explain':
+      await handleExplain(rest);
       return;
     case 'scan':
       await handleScan(rest);
@@ -349,16 +352,23 @@ async function handleShow(args: string[]): Promise<void> {
     throw new Error('Usage: show --id <catalog-id>');
   }
 
-  const [item, whitelist, quarantine] = await Promise.all([loadCatalogItemById(id), loadWhitelist(), loadQuarantine()]);
+  const [item, whitelist, quarantine, insights] = await Promise.all([
+    loadCatalogItemById(id),
+    loadWhitelist(),
+    loadQuarantine(),
+    loadItemInsights()
+  ]);
   if (!item) {
     throw new Error(`Catalog item not found: ${id}`);
   }
 
   const assessment = await assessRisk(item);
   const isQuarantined = quarantine.some((entry) => entry.id === item.id);
+  const insight = insights.get(item.id);
 
   printJson({
     ...item,
+    insight: insight ?? null,
     risk: {
       tier: assessment.riskTier,
       score: assessment.riskScore,
@@ -413,6 +423,61 @@ async function handleSearch(args: string[]): Promise<void> {
   );
 
   printHint('Use `show --id <catalog-id>` for full detail.');
+}
+
+async function handleExplain(args: string[]): Promise<void> {
+  const kinds = readKinds(args);
+  const providers = readCsvList(args, '--provider');
+  const format = readFlag(args, '--format') ?? 'table';
+  const limit = readLimit(args, 50) ?? 50;
+
+  const [items, insights] = await Promise.all([loadCatalogItems(), loadItemInsights()]);
+  let filtered = items;
+
+  if (kinds?.length) {
+    const set = new Set(kinds);
+    filtered = filtered.filter((item) => set.has(item.kind));
+  }
+
+  if (providers?.length) {
+    const set = new Set(providers.map((value) => value.toLowerCase()));
+    filtered = filtered.filter((item) => set.has(item.provider.toLowerCase()));
+  }
+
+  const rows = filtered
+    .slice()
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .slice(0, limit)
+    .map((item) => {
+      const insight = insights.get(item.id);
+      return {
+        id: item.id,
+        kind: item.kind,
+        provider: item.provider,
+        benefitSummary: insight?.benefitSummary ?? 'No insight data yet.',
+        bestFor: (insight?.bestFor ?? []).join('; '),
+        tradeoffs: (insight?.tradeoffs ?? []).join('; ')
+      };
+    });
+
+  if (format === 'json') {
+    printJson(rows);
+    return;
+  }
+
+  console.log(
+    renderTable(
+      [
+        { key: 'id', header: 'ID', width: 34 },
+        { key: 'kind', header: 'TYPE', width: 18 },
+        { key: 'provider', header: 'PROVIDER', width: 12 },
+        { key: 'benefitSummary', header: 'BENEFIT', width: 56 }
+      ],
+      rows
+    )
+  );
+
+  printHint('Use `show --id <catalog-id>` for full best-for, tradeoffs, and usage notes.');
 }
 
 async function handleScan(args: string[]): Promise<void> {
@@ -802,6 +867,7 @@ function printHelp(): void {
   logger.info('  sync [--kind skill,mcp,claude-plugin,copilot-extension] [--dry-run]');
   logger.info('  list [--kind ...] [--provider ...] [--risk-tier low|medium|high|critical] [--blocked true|false] [--search q] [--limit n] [--sort name|risk|trust] [--format json|table]');
   logger.info('  search <query>');
+  logger.info('  explain [--kind ...] [--provider ...] [--limit n] [--format json|table]');
   logger.info('  scan [--project .] [--format table|json] [--out scan-report.json] [--llm]');
   logger.info('  show --id <catalog-id>');
   logger.info('  top [--project .] [--requirements requirements.yml] [--kind ...] [--limit n] [--llm]');

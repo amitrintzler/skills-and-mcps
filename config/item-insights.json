@@ -1,0 +1,172 @@
+{
+  "insights": [
+    {
+      "id": "skill:secure-prompting",
+      "benefitSummary": "Reduces prompt-injection and unsafe output risk in agent workflows.",
+      "bestFor": ["Agent apps", "Security-focused AI features", "LLM integrations"],
+      "whenToUse": ["Before shipping prompt-driven features", "When adding external context/tool calls"],
+      "tradeoffs": ["Adds stricter prompts and validation steps", "Can reduce response flexibility"],
+      "usageNotes": ["Pair with strict security posture", "Use with risk assessment before install in CI"]
+    },
+    {
+      "id": "skill:ci-hardening",
+      "benefitSummary": "Raises CI trust by enforcing least-privilege, deterministic builds, and stronger scan gates.",
+      "bestFor": ["Repositories with GitHub Actions", "Teams with compliance requirements"],
+      "whenToUse": ["When PR checks are unstable", "Before open-source release"],
+      "tradeoffs": ["More strict checks can initially fail often", "Requires policy tuning"],
+      "usageNotes": ["Start in warn mode for new policies, then move to blocking"]
+    },
+    {
+      "id": "skill:threat-modeling-lite",
+      "benefitSummary": "Finds critical security gaps early with fast, repeatable threat-model templates.",
+      "bestFor": ["Security reviews", "Architecture changes", "New attack surface"],
+      "whenToUse": ["Before major releases", "When adding auth/network features"],
+      "tradeoffs": ["Requires reviewer time", "Needs periodic updates as architecture changes"],
+      "usageNotes": ["Attach output to PRs for audit traceability"]
+    },
+    {
+      "id": "skill:release-readiness",
+      "benefitSummary": "Improves release quality with structured gates for versioning, changelog, and test health.",
+      "bestFor": ["Semver-managed projects", "Teams with frequent releases"],
+      "whenToUse": ["Before tagging release", "During RC validation"],
+      "tradeoffs": ["Adds process overhead", "Can block rushed releases"],
+      "usageNotes": ["Combine with CI build + test + audit checks"]
+    },
+    {
+      "id": "skill:docs-automation",
+      "benefitSummary": "Keeps technical docs aligned with code and CLI behavior with lower manual effort.",
+      "bestFor": ["CLI frameworks", "Security workflow docs", "Onboarding guides"],
+      "whenToUse": ["After command changes", "Before publish"],
+      "tradeoffs": ["Generated docs still need human review", "Can drift if not run regularly"],
+      "usageNotes": ["Run from CI for consistent docs freshness"]
+    },
+    {
+      "id": "skill:fast-web-scrape",
+      "benefitSummary": "Accelerates bulk web extraction tasks for catalog enrichment and monitoring.",
+      "bestFor": ["Data gathering", "Market catalog snapshots"],
+      "whenToUse": ["When ingestion sources are fragmented", "For non-official optional feeds"],
+      "tradeoffs": ["Higher legal/compliance risk", "Potential anti-bot breakage"],
+      "usageNotes": ["Use only where source terms allow scraping"]
+    },
+    {
+      "id": "mcp:filesystem",
+      "benefitSummary": "Safe local file operations for analysis, diffing, and controlled write workflows.",
+      "bestFor": ["Local development", "Refactor support", "Repository maintenance"],
+      "whenToUse": ["When tool needs workspace file access"],
+      "tradeoffs": ["Needs strict path controls", "Write access can be dangerous without guardrails"],
+      "usageNotes": ["Prefer read-first policies in sensitive repos"]
+    },
+    {
+      "id": "mcp:github-actions-auditor",
+      "benefitSummary": "Detects insecure workflow patterns and permission issues before they reach production.",
+      "bestFor": ["GitHub Actions-heavy repos", "Security hardening efforts"],
+      "whenToUse": ["After workflow edits", "During security reviews"],
+      "tradeoffs": ["Can produce noisy findings initially", "Needs suppression policy"],
+      "usageNotes": ["Pair with CodeQL + dependency review checks"]
+    },
+    {
+      "id": "mcp:dependency-intel",
+      "benefitSummary": "Adds actionable dependency risk context and upgrade paths for faster remediation.",
+      "bestFor": ["Node/Python ecosystems", "SBOM-driven programs"],
+      "whenToUse": ["When audit reports are frequent", "Before release cut"],
+      "tradeoffs": ["Requires periodic feed updates", "May recommend breaking upgrades"],
+      "usageNotes": ["Use with allowlist policy and risk tiers"]
+    },
+    {
+      "id": "mcp:policy-as-code",
+      "benefitSummary": "Enforces repeatable policy decisions across CI/CD and repo configuration.",
+      "bestFor": ["Governance teams", "High-compliance projects"],
+      "whenToUse": ["When manual review is inconsistent", "Before scaling contributor base"],
+      "tradeoffs": ["Policy authoring takes time", "Overly strict policies can reduce velocity"],
+      "usageNotes": ["Start with visibility mode then enforce"]
+    },
+    {
+      "id": "mcp:release-governance",
+      "benefitSummary": "Prevents weak releases by validating versioning, gates, and readiness evidence.",
+      "bestFor": ["Package publishers", "Teams with release SLAs"],
+      "whenToUse": ["Pre-release checklist", "Hotfix validation"],
+      "tradeoffs": ["Introduces extra release checks", "Needs agreement on policy thresholds"],
+      "usageNotes": ["Integrate with changelog + semver automation"]
+    },
+    {
+      "id": "mcp:repo-observability",
+      "benefitSummary": "Tracks quality/security trends so regressions are visible early.",
+      "bestFor": ["Long-lived repos", "Cross-team platform ownership"],
+      "whenToUse": ["Weekly health reviews", "Incident follow-ups"],
+      "tradeoffs": ["Needs baseline metrics", "Can add dashboard noise"],
+      "usageNotes": ["Focus on a small set of KPIs first"]
+    },
+    {
+      "id": "mcp:remote-browser",
+      "benefitSummary": "Enables browser automation workflows for dynamic UIs and end-to-end checks.",
+      "bestFor": ["UI validation", "Synthetic user flows"],
+      "whenToUse": ["When APIs are insufficient for validation"],
+      "tradeoffs": ["Higher security exposure via remote control", "More flaky than API-level tests"],
+      "usageNotes": ["Currently high-risk in this policy setup; requires explicit override"]
+    },
+    {
+      "id": "claude-plugin:workspace-ops",
+      "benefitSummary": "Speeds internal operations by letting teams query docs/tasks from Claude.",
+      "bestFor": ["Knowledge-heavy orgs", "Ops workflows"],
+      "whenToUse": ["For internal support and coordination"],
+      "tradeoffs": ["Depends on source system quality", "Access control must be verified"],
+      "usageNotes": ["Scope permissions to least privilege"]
+    },
+    {
+      "id": "claude-plugin:repo-threat-review",
+      "benefitSummary": "Improves PR security review quality with threat-oriented feedback loops.",
+      "bestFor": ["Security-conscious engineering teams", "Critical repos"],
+      "whenToUse": ["On risky PRs", "When adding new integrations"],
+      "tradeoffs": ["Can surface many low-priority findings", "Needs tuning to team context"],
+      "usageNotes": ["Use with blocked-tier policy for merge gates"]
+    },
+    {
+      "id": "claude-plugin:incident-summarizer",
+      "benefitSummary": "Cuts incident response time by turning fragmented logs into coherent timelines.",
+      "bestFor": ["On-call teams", "Postmortems"],
+      "whenToUse": ["During incident triage", "After outages"],
+      "tradeoffs": ["Quality depends on input signal quality", "May miss hidden causal chains"],
+      "usageNotes": ["Keep manual validation loop before final report"]
+    },
+    {
+      "id": "claude-plugin:compliance-evidence",
+      "benefitSummary": "Automates evidence collection for audits and recurring compliance checks.",
+      "bestFor": ["SOC2/ISO-style programs", "Security governance"],
+      "whenToUse": ["Before audits", "For monthly compliance snapshots"],
+      "tradeoffs": ["Can produce bulky evidence sets", "Needs clear retention strategy"],
+      "usageNotes": ["Store outputs in immutable audit artifacts"]
+    },
+    {
+      "id": "copilot-extension:repo-security",
+      "benefitSummary": "Brings dependency and code-scan findings directly into developer workflows.",
+      "bestFor": ["GitHub-native teams", "Shift-left security adoption"],
+      "whenToUse": ["During PR authoring/review", "When fixing vulnerabilities"],
+      "tradeoffs": ["Findings volume may overwhelm teams at first", "Requires triage discipline"],
+      "usageNotes": ["Use with severity thresholds in CI"]
+    },
+    {
+      "id": "copilot-extension:actions-guardian",
+      "benefitSummary": "Hardens GitHub Actions quickly with actionable permission and supply-chain checks.",
+      "bestFor": ["Repos with many workflows", "Security hardening programs"],
+      "whenToUse": ["After workflow changes", "Before enabling public contributions"],
+      "tradeoffs": ["May flag legacy patterns aggressively", "Requires remediation backlog"],
+      "usageNotes": ["Pair with branch protection required checks"]
+    },
+    {
+      "id": "copilot-extension:sbom-advisor",
+      "benefitSummary": "Turns SBOM/security data into prioritized fix plans for maintainers.",
+      "bestFor": ["Dependency-heavy repos", "Security operations teams"],
+      "whenToUse": ["After SBOM generation", "For quarterly risk reviews"],
+      "tradeoffs": ["Requires accurate package metadata", "False positives possible"],
+      "usageNotes": ["Cross-check with Dependabot and audit outputs"]
+    },
+    {
+      "id": "copilot-extension:release-gatekeeper",
+      "benefitSummary": "Ensures release quality by enforcing agreed policy gates in one flow.",
+      "bestFor": ["Teams with strict release policies", "Public package maintainers"],
+      "whenToUse": ["Before release publish", "Before tag creation"],
+      "tradeoffs": ["Can block urgent releases", "Needs calibrated policy exceptions"],
+      "usageNotes": ["Define emergency override process upfront"]
+    }
+  ]
+}
