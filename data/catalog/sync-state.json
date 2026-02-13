@@ -1,3 +1,7 @@
 {
-  "registries": {}
+  "registries": {
+    "public-mcp-directory": {
+      "lastUpdatedSince": "2026-02-13T05:01:33.771Z"
+    }
+  }
 }
