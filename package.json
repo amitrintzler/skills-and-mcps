@@ -39,8 +39,8 @@
     "quarantine:apply": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts quarantine apply"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.419",
-    "@types/react": "^19.2.13",
+    "@remotion/cli": "^4.0.421",
+    "@types/react": "^19.2.14",
     "fs-extra": "^11.2.0",
     "globby": "^14.0.1",
     "react": "^19.2.4",
