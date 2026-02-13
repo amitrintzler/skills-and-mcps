@@ -389,9 +389,15 @@ Primary runtime contracts validated with Zod:
 
 ## Backward Compatibility
 
-Legacy aliases remain supported:
-- `ingest` -> `sync`
-- `validate` -> `whitelist verify`
+Legacy ingestion scripts are still available:
+- `npm run ingest:skills`
+- `npm run ingest:mcps`
+- `npm run ingest:claude-plugins`
+- `npm run ingest:copilot-extensions`
+- `npm run ingest:all`
+
+Validation script compatibility:
+- `npm run validate:data` (schema/data contract validation)
 
 ---
 
