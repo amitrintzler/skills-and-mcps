@@ -42,7 +42,7 @@
     "@remotion/cli": "4.0.421",
     "@types/react": "^19.2.13",
     "fs-extra": "^11.2.0",
-    "globby": "^14.0.1",
+    "globby": "^16.1.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "remotion": "4.0.421",
