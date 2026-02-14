@@ -7,16 +7,16 @@
     "provider": "openai",
     "capabilities": [
       "automation",
-      "security",
-      "code-scanning"
+      "code-scanning",
+      "security"
     ],
     "compatibility": [
-      "node",
+      "general",
       "github",
-      "general"
+      "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-12",
+    "lastSeenAt": "2026-02-14",
     "install": {
       "kind": "skill.sh",
       "target": "ci-hardening",
@@ -43,16 +43,16 @@
     "provider": "openai",
     "capabilities": [
       "automation",
-      "search",
-      "prompting"
+      "prompting",
+      "search"
     ],
     "compatibility": [
+      "general",
       "node",
-      "python",
-      "general"
+      "python"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-12",
+    "lastSeenAt": "2026-02-14",
     "install": {
       "kind": "skill.sh",
       "target": "docs-automation",
@@ -78,14 +78,14 @@
     "description": "High-throughput data extraction helpers for websites.",
     "provider": "openai",
     "capabilities": [
-      "scraping",
-      "automation"
+      "automation",
+      "scraping"
     ],
     "compatibility": [
       "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-12",
+    "lastSeenAt": "2026-02-14",
     "install": {
       "kind": "skill.sh",
       "target": "fast-web-scrape",
@@ -96,9 +96,9 @@
     "provenanceSignal": 40,
     "freshnessSignal": 50,
     "securitySignals": {
-      "knownVulnerabilities": 1,
-      "suspiciousPatterns": 1,
-      "injectionFindings": 1,
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
       "exfiltrationSignals": 0,
       "integrityAlerts": 0
     },
@@ -116,12 +116,12 @@
       "search"
     ],
     "compatibility": [
-      "node",
+      "general",
       "github",
-      "general"
+      "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-12",
+    "lastSeenAt": "2026-02-14",
     "install": {
       "kind": "skill.sh",
       "target": "release-readiness",
@@ -147,17 +147,17 @@
     "description": "Prompt hardening patterns for high-safety agent workloads.",
     "provider": "openai",
     "capabilities": [
+      "guardrails",
       "prompting",
-      "security",
-      "guardrails"
+      "security"
     ],
     "compatibility": [
+      "general",
       "node",
-      "python",
-      "general"
+      "python"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-12",
+    "lastSeenAt": "2026-02-14",
     "install": {
       "kind": "skill.sh",
       "target": "secure-prompting",
@@ -183,17 +183,17 @@
     "description": "Fast threat modeling workflow for repo-level security reviews.",
     "provider": "openai",
     "capabilities": [
-      "security",
+      "dependency-audit",
       "guardrails",
-      "dependency-audit"
+      "security"
     ],
     "compatibility": [
+      "general",
       "node",
-      "python",
-      "general"
+      "python"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-12",
+    "lastSeenAt": "2026-02-14",
     "install": {
       "kind": "skill.sh",
       "target": "threat-modeling-lite",
