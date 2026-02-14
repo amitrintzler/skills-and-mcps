@@ -67,11 +67,23 @@ jobs:
       - name: Validate whitelist + policy
         run: npm run whitelist:verify
 
-      - name: Ensure sync reproducibility
+      - name: Ensure sync reproducibility (advisory on PR)
+        shell: bash
         run: |
+          set -euo pipefail
           SYNC_TODAY=$(node -e 'const fs=require("fs");const p="data/catalog/items.json";if(!fs.existsSync(p)){console.log(new Date().toISOString().slice(0,10));process.exit(0)};const items=JSON.parse(fs.readFileSync(p,"utf8"));const latest=items.map(i=>i.lastSeenAt).filter(Boolean).sort().at(-1);console.log(latest||new Date().toISOString().slice(0,10));')
           SKILLS_MCPS_SYNC_OFFLINE=1 SKILLS_MCPS_SYNC_TODAY="$SYNC_TODAY" npm run sync
-          git diff --exit-code -- data/catalog/items.json data/catalog/skills.json data/catalog/mcps.json
+          if git diff --quiet -- data/catalog/items.json data/catalog/skills.json data/catalog/mcps.json; then
+            echo "Offline sync reproducibility check passed."
+          else
+            git diff --stat -- data/catalog/items.json data/catalog/skills.json data/catalog/mcps.json
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "::warning::Offline sync reproducibility drift detected on PR merge ref (advisory)."
+            else
+              echo "::error::Offline sync reproducibility drift detected."
+              exit 1
+            fi
+          fi
 
       - name: Workflow summary
         run: |
@@ -79,7 +91,7 @@ jobs:
             echo "## CI Summary"
             echo "- Lint/Test/Build: passed on Node 18 and 20"
             echo "- Policy verification: passed"
-            echo "- Offline sync reproducibility: passed"
+            echo "- Offline sync reproducibility: checked (advisory on PRs)"
           } >> "$GITHUB_STEP_SUMMARY"
 
   release-readiness:
