@@ -1,9 +1,3 @@
 {
-  "quarantined": [
-    {
-      "id": "mcp:filesystem",
-      "reason": "Catalog item missing",
-      "quarantinedAt": "2026-02-13T05:01:35.082Z"
-    }
-  ]
+  "quarantined": []
 }
