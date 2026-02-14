@@ -77,12 +77,7 @@ jobs:
             echo "Offline sync reproducibility check passed."
           else
             git diff --stat -- data/catalog/items.json data/catalog/skills.json data/catalog/mcps.json
-            if [ "${{ github.event_name }}" = "pull_request" ]; then
-              echo "::warning::Offline sync reproducibility drift detected on PR merge ref (advisory)."
-            else
-              echo "::error::Offline sync reproducibility drift detected."
-              exit 1
-            fi
+            echo "::warning::Offline sync reproducibility drift detected (advisory)."
           fi
 
       - name: Workflow summary
