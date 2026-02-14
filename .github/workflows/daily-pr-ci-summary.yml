@@ -1,0 +1,208 @@
+name: Daily PR and CI Summary
+
+on:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: daily-pr-ci-summary-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  summary:
+    name: Publish Daily Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Build and publish summary issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const generatedAt = new Date().toISOString();
+            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+            const failedConclusions = new Set([
+              'failure',
+              'timed_out',
+              'cancelled',
+              'startup_failure',
+              'action_required'
+            ]);
+
+            const openPrs = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: 'open',
+              base: 'main',
+              per_page: 100
+            });
+
+            const failingPrs = [];
+            for (const pr of openPrs) {
+              const checkRuns = await github.paginate(github.rest.checks.listForRef, {
+                owner,
+                repo,
+                ref: pr.head.sha,
+                per_page: 100
+              });
+
+              const latestByName = new Map();
+              for (const check of checkRuns) {
+                const key = check.name;
+                const candidateTs = new Date(check.started_at || check.completed_at || 0).getTime();
+                const existing = latestByName.get(key);
+                const existingTs = existing
+                  ? new Date(existing.started_at || existing.completed_at || 0).getTime()
+                  : -1;
+                if (!existing || candidateTs > existingTs) {
+                  latestByName.set(key, check);
+                }
+              }
+
+              const latestChecks = Array.from(latestByName.values());
+              const failingChecks = latestChecks.filter(
+                (check) => check.status === 'completed' && failedConclusions.has(check.conclusion || '')
+              );
+
+              if (failingChecks.length) {
+                failingPrs.push({
+                  number: pr.number,
+                  title: pr.title,
+                  url: pr.html_url,
+                  checks: failingChecks.map((check) => ({
+                    name: check.name,
+                    url: check.html_url || check.details_url || ''
+                  }))
+                });
+              }
+            }
+
+            const workflowRuns = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+              owner,
+              repo,
+              per_page: 100
+            });
+
+            const recentFailedRuns = workflowRuns
+              .filter((run) => {
+                const createdAt = new Date(run.created_at);
+                return createdAt >= oneDayAgo && run.conclusion === 'failure';
+              })
+              .slice(0, 15)
+              .map((run) => ({
+                name: run.name,
+                title: run.display_title,
+                event: run.event,
+                url: run.html_url,
+                createdAt: run.created_at
+              }));
+
+            const botPrCount = openPrs.filter((pr) => {
+              const login = (pr.user?.login || '').toLowerCase();
+              return pr.user?.type === 'Bot' || login.includes('dependabot') || login.includes('github-actions');
+            }).length;
+            const humanPrCount = openPrs.length - botPrCount;
+
+            const lines = [];
+            lines.push('<!-- daily-pr-ci-summary -->');
+            lines.push('# Daily PR and CI Summary');
+            lines.push('');
+            lines.push(`Generated: \`${generatedAt}\``);
+            lines.push('');
+            lines.push('## PR Overview');
+            lines.push(`- Open PRs (base \`main\`): **${openPrs.length}**`);
+            lines.push(`- Bot PRs: **${botPrCount}**`);
+            lines.push(`- Human PRs: **${humanPrCount}**`);
+            lines.push('');
+
+            if (openPrs.length) {
+              lines.push('### Open PR List');
+              for (const pr of openPrs.slice(0, 25)) {
+                lines.push(`- [#${pr.number}](${pr.html_url}) ${pr.title}`);
+              }
+              if (openPrs.length > 25) {
+                lines.push(`- ...and ${openPrs.length - 25} more`);
+              }
+              lines.push('');
+            }
+
+            lines.push('## Failing PR Checks');
+            if (!failingPrs.length) {
+              lines.push('- No failing checks detected on open PRs.');
+            } else {
+              for (const pr of failingPrs) {
+                lines.push(`- [#${pr.number}](${pr.url}) ${pr.title}`);
+                for (const check of pr.checks.slice(0, 10)) {
+                  if (check.url) {
+                    lines.push(`  - ${check.name}: ${check.url}`);
+                  } else {
+                    lines.push(`  - ${check.name}`);
+                  }
+                }
+              }
+            }
+            lines.push('');
+
+            lines.push('## Failed Workflow Runs (Last 24h)');
+            if (!recentFailedRuns.length) {
+              lines.push('- No failed workflow runs in the last 24 hours.');
+            } else {
+              for (const run of recentFailedRuns) {
+                lines.push(`- [${run.name}](${run.url}) (${run.event}) at \`${run.createdAt}\` - ${run.title}`);
+              }
+            }
+            lines.push('');
+            lines.push('This issue is updated daily by workflow automation.');
+
+            const body = lines.join('\n');
+            const issueTitle = 'Daily PR/CI Summary';
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            const existing = openIssues.find(
+              (issue) =>
+                !issue.pull_request &&
+                issue.title === issueTitle &&
+                issue.user?.login === 'github-actions[bot]'
+            );
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body
+              });
+              core.info(`Updated summary issue #${existing.number}.`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title: issueTitle,
+                body
+              });
+              core.info(`Created summary issue #${created.data.number}.`);
+              try {
+                await github.rest.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number: created.data.number,
+                  labels: ['ci-summary']
+                });
+              } catch (error) {
+                core.warning(`Could not apply ci-summary label: ${error.message}`);
+              }
+            }
