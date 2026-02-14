@@ -11,6 +11,10 @@ updates:
       - dependencies
       - security
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
     groups:
       npm-minor-patch:
         patterns:
@@ -30,6 +34,10 @@ updates:
       - dependencies
       - security
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
     groups:
       actions-minor-patch:
         patterns:

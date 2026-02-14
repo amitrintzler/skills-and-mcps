@@ -1,0 +1,114 @@
+name: PR Auto Merge
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+      - Security / CodeQL
+      - Security / Dependency Review
+      - Security / SBOM + Trivy
+      - Security / Secrets
+    types: [completed]
+
+permissions:
+  actions: read
+  checks: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-auto-merge-${{ github.event.workflow_run.id }}
+  cancel-in-progress: true
+
+jobs:
+  merge-when-green:
+    name: Merge When Checks Pass
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Merge passing bot PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+            const prs = run.pull_requests || [];
+            if (!prs.length) {
+              core.info('No PR attached to this workflow run.');
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = prs[0].number;
+            const prResp = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            const pr = prResp.data;
+            const author = pr.user?.login || '';
+            const isBotPr = author.includes('dependabot') || author.includes('github-actions');
+
+            if (!isBotPr) {
+              core.info(`Skipping non-bot PR #${prNumber} by ${author}.`);
+              return;
+            }
+
+            if (pr.base.ref !== 'main' || pr.draft) {
+              core.info(`Skipping PR #${prNumber} (base=${pr.base.ref}, draft=${pr.draft}).`);
+              return;
+            }
+
+            const checkRuns = await github.paginate(github.rest.checks.listForRef, {
+              owner,
+              repo,
+              ref: pr.head.sha,
+              per_page: 100
+            });
+
+            const latestByName = new Map();
+            for (const check of checkRuns) {
+              if (!latestByName.has(check.name)) {
+                latestByName.set(check.name, check);
+              }
+            }
+            const latestChecks = Array.from(latestByName.values());
+
+            const failedConclusions = new Set(['failure', 'timed_out', 'cancelled', 'startup_failure', 'action_required']);
+            const failingChecks = latestChecks.filter(
+              (check) => check.status === 'completed' && failedConclusions.has(check.conclusion || '')
+            );
+            const pendingChecks = latestChecks.filter(
+              (check) => check.status !== 'completed' || check.conclusion == null
+            );
+
+            const combined = await github.rest.repos.getCombinedStatusForRef({
+              owner,
+              repo,
+              ref: pr.head.sha
+            });
+            const statusState = combined.data.state;
+
+            if (failingChecks.length || statusState === 'failure' || statusState === 'error') {
+              core.info(`PR #${prNumber} still failing checks; not merging.`);
+              return;
+            }
+
+            if (pendingChecks.length || statusState === 'pending') {
+              core.info(`PR #${prNumber} still has pending checks; not merging.`);
+              return;
+            }
+
+            if (!latestChecks.length && combined.data.total_count === 0) {
+              core.info(`PR #${prNumber} has no checks yet; not merging.`);
+              return;
+            }
+
+            try {
+              await github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: prNumber,
+                merge_method: 'squash'
+              });
+              core.info(`Merged PR #${prNumber}.`);
+            } catch (error) {
+              core.warning(`Could not merge PR #${prNumber}: ${error.message}`);
+            }
