@@ -1,1 +1,286 @@
-[]
+[
+  {
+    "id": "mcp:dependency-intel",
+    "kind": "mcp",
+    "name": "Dependency Intel MCP",
+    "description": "Correlate package vulnerabilities, advisories, and upgrade guidance.",
+    "provider": "mcp",
+    "capabilities": [
+      "dependency-audit",
+      "security",
+      "search"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "general"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-12",
+    "transport": "http",
+    "authModel": "api_key",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-dependency-intel",
+      "args": [
+        "--transport",
+        "http"
+      ]
+    },
+    "adoptionSignal": 79,
+    "maintenanceSignal": 84,
+    "provenanceSignal": 92,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:filesystem",
+    "kind": "mcp",
+    "name": "Filesystem MCP Server",
+    "description": "Access local files in read/write mode.",
+    "provider": "mcp",
+    "capabilities": [
+      "file-read",
+      "file-write",
+      "search"
+    ],
+    "compatibility": [
+      "node",
+      "python",
+      "container"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-12",
+    "transport": "stdio",
+    "authModel": "none",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-filesystem",
+      "args": [
+        "--transport",
+        "stdio"
+      ]
+    },
+    "adoptionSignal": 84,
+    "maintenanceSignal": 81,
+    "provenanceSignal": 95,
+    "freshnessSignal": 70,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 1,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:github-actions-auditor",
+    "kind": "mcp",
+    "name": "GitHub Actions Auditor MCP",
+    "description": "Audit workflow permissions, unsafe patterns, and missing security controls.",
+    "provider": "mcp",
+    "capabilities": [
+      "security",
+      "code-scanning",
+      "automation"
+    ],
+    "compatibility": [
+      "node",
+      "github",
+      "general"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-12",
+    "transport": "http",
+    "authModel": "api_key",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-gha-auditor",
+      "args": [
+        "--transport",
+        "http"
+      ]
+    },
+    "adoptionSignal": 77,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 93,
+    "freshnessSignal": 78,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:policy-as-code",
+    "kind": "mcp",
+    "name": "Policy-as-Code MCP",
+    "description": "Evaluate policy bundles against CI/CD and repository configuration.",
+    "provider": "mcp",
+    "capabilities": [
+      "guardrails",
+      "security",
+      "automation"
+    ],
+    "compatibility": [
+      "node",
+      "container",
+      "general"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-12",
+    "transport": "stdio",
+    "authModel": "none",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-policy-as-code",
+      "args": [
+        "--transport",
+        "stdio"
+      ]
+    },
+    "adoptionSignal": 73,
+    "maintenanceSignal": 80,
+    "provenanceSignal": 90,
+    "freshnessSignal": 77,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:release-governance",
+    "kind": "mcp",
+    "name": "Release Governance MCP",
+    "description": "Check release readiness, versioning alignment, and changelog integrity.",
+    "provider": "mcp",
+    "capabilities": [
+      "guardrails",
+      "automation",
+      "search"
+    ],
+    "compatibility": [
+      "node",
+      "github",
+      "general"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-12",
+    "transport": "stdio",
+    "authModel": "none",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-release-governance",
+      "args": [
+        "--transport",
+        "stdio"
+      ]
+    },
+    "adoptionSignal": 71,
+    "maintenanceSignal": 78,
+    "provenanceSignal": 89,
+    "freshnessSignal": 73,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:remote-browser",
+    "kind": "mcp",
+    "name": "Remote Browser MCP",
+    "description": "Remote browser automation via network transport.",
+    "provider": "mcp",
+    "capabilities": [
+      "browser-control",
+      "automation"
+    ],
+    "compatibility": [
+      "node"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-12",
+    "transport": "http",
+    "authModel": "api_key",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-remote-browser",
+      "args": [
+        "--transport",
+        "http"
+      ]
+    },
+    "adoptionSignal": 66,
+    "maintenanceSignal": 58,
+    "provenanceSignal": 88,
+    "freshnessSignal": 64,
+    "securitySignals": {
+      "knownVulnerabilities": 1,
+      "suspiciousPatterns": 2,
+      "injectionFindings": 1,
+      "exfiltrationSignals": 1,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  },
+  {
+    "id": "mcp:repo-observability",
+    "kind": "mcp",
+    "name": "Repository Observability MCP",
+    "description": "Track quality, reliability, and security trends from repo events.",
+    "provider": "mcp",
+    "capabilities": [
+      "search",
+      "automation",
+      "security"
+    ],
+    "compatibility": [
+      "node",
+      "github",
+      "general"
+    ],
+    "source": "public-mcp-directory",
+    "lastSeenAt": "2026-02-12",
+    "transport": "http",
+    "authModel": "api_key",
+    "install": {
+      "kind": "skill.sh",
+      "target": "mcp-repo-observability",
+      "args": [
+        "--transport",
+        "http"
+      ]
+    },
+    "adoptionSignal": 69,
+    "maintenanceSignal": 76,
+    "provenanceSignal": 88,
+    "freshnessSignal": 71,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {}
+  }
+]
