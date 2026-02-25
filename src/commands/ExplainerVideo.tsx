@@ -134,7 +134,7 @@ const SceneShell: React.FC<{
           <div style={{ fontSize: 16, color: palette.accent, fontWeight: 700 }}>
             {`Walkthrough ${sceneNumber}/${sceneCount}`}
           </div>
-          <div style={{ fontSize: 15, color: palette.muted }}>{'skills + mcp + plugin security intelligence framework'}</div>
+          <div style={{ fontSize: 15, color: palette.muted }}>{'toolkit | skills + mcp + plugin security intelligence'}</div>
         </div>
         <div style={{ height: 8, borderRadius: 999, backgroundColor: '#1e293b', overflow: 'hidden' }}>
           <div
@@ -208,8 +208,8 @@ const SceneIntro: React.FC = () => (
       <TerminalBlock
         command="npm run about"
         lines={[
-          'skills-and-mcps v0.1.0',
-          'Public Skills + MCP security recommendation framework',
+          'toolkit v0.2.0',
+          'Toolkit: Skills + MCP + Plugin security intelligence framework',
           'Scope: skills, MCP servers, Claude plugins, Copilot extensions',
           'Ranking: trust-first (fit + trust - risk penalties + freshness bonus)',
           'Sources: official-first provider registries with local fallback'
@@ -555,7 +555,7 @@ const SceneOutro: React.FC = () => (
         tone="info"
       />
     }
-    footer={['Repository: github.com/amitrintzler/skills-and-mcps', 'Use README quick links for full command map', 'Built for speed + safety']}
+    footer={['Repository: github.com/amitrintzler/skills-and-mcps', 'Use README quick links for full command map', 'Toolkit: built for speed + safety']}
   />
 );
 

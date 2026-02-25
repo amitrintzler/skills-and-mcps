@@ -1,4 +1,4 @@
-<h1 align="center">Skills + MCP + Plugin Security Intelligence Framework</h1>
+<h1 align="center">Toolkit</h1>
 
 <p align="center">
   <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/ci.yml/badge.svg?branch=main" /></a>
@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  A production-grade CLI framework to discover, rank, validate, and safely install <strong>Skills</strong>,
+  <strong>Toolkit</strong> is a production-grade CLI framework to discover, rank, validate, and safely install <strong>Skills</strong>,
   <strong>MCP servers</strong>, <strong>Claude plugins</strong>, and <strong>Copilot extensions</strong>.
 </p>
 

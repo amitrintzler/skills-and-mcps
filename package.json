@@ -1,7 +1,7 @@
 {
-  "name": "skills-and-mcps",
-  "version": "0.1.0",
-  "description": "Public Skills + MCP security recommendation framework",
+  "name": "toolkit",
+  "version": "0.2.0",
+  "description": "Toolkit: Skills + MCP + Plugin security intelligence framework",
   "private": false,
   "type": "module",
   "engines": {

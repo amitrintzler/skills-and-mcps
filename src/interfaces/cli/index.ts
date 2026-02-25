@@ -94,7 +94,7 @@ async function handleAbout(): Promise<void> {
   const packageRaw = await fs.readFile(path.resolve('package.json'), 'utf8');
   const pkg = JSON.parse(packageRaw) as { name?: string; version?: string; description?: string };
 
-  console.log(`${pkg.name ?? 'skills-and-mcps'} v${pkg.version ?? '0.0.0'}`);
+  console.log(`${pkg.name ?? 'toolkit'} v${pkg.version ?? '0.0.0'}`);
   if (pkg.description) {
     console.log(pkg.description);
   }
