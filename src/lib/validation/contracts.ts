@@ -142,6 +142,7 @@ export const RegistrySchema = z.object({
       'direct',
       'mcp-registry-v0.1',
       'openai-skills-v1',
+      'openai-skills-github-v1',
       'claude-plugins-v0.1',
       'copilot-extensions-v0.1'
     ])

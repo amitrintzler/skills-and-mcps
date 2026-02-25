@@ -144,12 +144,12 @@
         "url": "https://registry.modelcontextprotocol.io/v0.1/servers",
         "format": "catalog-json",
         "entryPath": "servers",
-        "supportsUpdatedSince": true,
+        "supportsUpdatedSince": false,
         "updatedSinceParam": "updated_since",
         "pagination": {
           "mode": "cursor",
           "cursorParam": "cursor",
-          "nextCursorPath": "next_cursor",
+          "nextCursorPath": "metadata.nextCursor",
           "limitParam": "limit",
           "limit": 100
         },
@@ -308,6 +308,24 @@
           }
         }
       ]
+    },
+    {
+      "id": "openai-skills-curated",
+      "kind": "skill",
+      "sourceType": "vendor-feed",
+      "adapter": "openai-skills-github-v1",
+      "enabled": true,
+      "officialOnly": true,
+      "remote": {
+        "url": "https://api.github.com/repos/openai/skills/contents/skills/.curated",
+        "format": "json-array",
+        "timeoutMs": 10000,
+        "fallbackToLocal": true,
+        "provider": "openai",
+        "official": true,
+        "licenseHint": "vendor"
+      },
+      "entries": []
     },
     {
       "id": "official-claude-plugins",

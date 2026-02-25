@@ -2,6 +2,7 @@ import type { Registry } from '../lib/validation/contracts.js';
 import { adaptClaudePluginsEntries } from './adapters/claude-plugins-v0.1.js';
 import { adaptCopilotExtensionsEntries } from './adapters/copilot-extensions-v0.1.js';
 import { adaptMcpRegistryEntries } from './adapters/mcp-registry-v0.1.js';
+import { adaptOpenAiSkillsGitHubEntries } from './adapters/openai-skills-github-v1.js';
 import { adaptOpenAiSkillsEntries } from './adapters/openai-skills-v1.js';
 
 export function adaptRegistryEntries(registry: Registry, entries: unknown[]): unknown[] {
@@ -11,6 +12,10 @@ export function adaptRegistryEntries(registry: Registry, entries: unknown[]): un
 
   if (registry.adapter === 'openai-skills-v1') {
     return adaptOpenAiSkillsEntries(registry.id, entries);
+  }
+
+  if (registry.adapter === 'openai-skills-github-v1') {
+    return adaptOpenAiSkillsGitHubEntries(registry.id, entries);
   }
 
   if (registry.adapter === 'claude-plugins-v0.1') {
