@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CatalogItemSchema, RegistrySchema } from '../../src/lib/validation/contracts.js';
 
 describe('RegistrySchema', () => {
-  it('accepts plugin kinds and new adapters', () => {
+  it('accepts plugin kinds and adapter variants', () => {
     const claude = RegistrySchema.parse({
       id: 'official-claude-plugins',
       kind: 'claude-plugin',
@@ -22,8 +22,28 @@ describe('RegistrySchema', () => {
       entries: []
     });
 
+    const copilotMarketplace = RegistrySchema.parse({
+      id: 'github-copilot-plugins-official',
+      kind: 'copilot-extension',
+      sourceType: 'vendor-feed',
+      adapter: 'copilot-plugin-marketplace-v1',
+      enabled: true,
+      entries: []
+    });
+
+    const claudeConnectors = RegistrySchema.parse({
+      id: 'anthropic-claude-connectors-scrape',
+      kind: 'claude-plugin',
+      sourceType: 'vendor-feed',
+      adapter: 'claude-connectors-scrape-v1',
+      enabled: true,
+      entries: []
+    });
+
     expect(claude.kind).toBe('claude-plugin');
     expect(copilot.kind).toBe('copilot-extension');
+    expect(copilotMarketplace.adapter).toBe('copilot-plugin-marketplace-v1');
+    expect(claudeConnectors.adapter).toBe('claude-connectors-scrape-v1');
   });
 });
 

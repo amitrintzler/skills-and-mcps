@@ -83,13 +83,24 @@ function normalizeItems(records: unknown[], registry: Registry, today: string): 
   return records
     .map((entry) => {
       const value = ensureObject(entry);
+      const entryMetadata =
+        value.metadata && typeof value.metadata === 'object' && !Array.isArray(value.metadata)
+          ? (value.metadata as Record<string, unknown>)
+          : {};
+
       return CatalogItemSchema.parse({
         ...value,
         id: normalizeId(String(value.id ?? ''), registry.kind),
         kind: value.kind ?? registry.kind,
         provider: value.provider ?? registry.remote?.provider ?? inferProviderFromKind(registry.kind),
         source: value.source ?? registry.id,
-        lastSeenAt: value.lastSeenAt ?? today
+        lastSeenAt: value.lastSeenAt ?? today,
+        metadata: {
+          ...entryMetadata,
+          sourceRegistryId: registry.id,
+          sourceType: entryMetadata.sourceType ?? registry.sourceType,
+          sourceConfidence: entryMetadata.sourceConfidence ?? defaultSourceConfidence(registry.sourceType)
+        }
       });
     })
     .sort((a, b) => a.id.localeCompare(b.id));
@@ -178,4 +189,11 @@ function countByKind(items: CatalogItem[]): Record<CatalogKind, number> {
       'copilot-extension': 0
     }
   );
+}
+
+function defaultSourceConfidence(sourceType: Registry['sourceType']): string {
+  if (sourceType === 'vendor-feed' || sourceType === 'public-index') {
+    return 'official';
+  }
+  return 'vetted-curated';
 }

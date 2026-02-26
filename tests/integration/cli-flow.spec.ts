@@ -1,20 +1,24 @@
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { ITEMS_PATH, loadWhitelist, MCPS_PATH, QUARANTINE_PATH, SKILLS_PATH, WHITELIST_PATH } from '../../src/catalog/repository.js';
+import * as repository from '../../src/catalog/repository.js';
 import { syncCatalogs } from '../../src/catalog/sync.js';
+import { getSyncStatePath } from '../../src/catalog/sync-state.js';
 import { installWithSkillSh } from '../../src/install/skillsh.js';
 import { detectProjectSignals } from '../../src/recommendation/project-analysis.js';
 import { recommend } from '../../src/recommendation/engine.js';
 import { loadRequirementsProfile } from '../../src/recommendation/requirements.js';
 import { applyQuarantineFromReport, verifyWhitelist } from '../../src/security/whitelist.js';
 
-const SYNC_STATE_PATH = 'data/catalog/sync-state.json';
-const SNAPSHOT_PATHS = [WHITELIST_PATH, QUARANTINE_PATH, ITEMS_PATH, SKILLS_PATH, MCPS_PATH, SYNC_STATE_PATH];
-const PER_TEST_RESTORE_PATHS = [WHITELIST_PATH, QUARANTINE_PATH];
+const TOOLKIT_HOME = path.resolve(
+  path.join(os.tmpdir(), `toolkit-cli-flow-${process.pid}-${Math.random().toString(16).slice(2)}`)
+);
 type FileSnapshot = { exists: boolean; content: string };
 const snapshots = new Map<string, FileSnapshot>();
+let previousToolkitHome: string | undefined;
 
 async function snapshotFile(filePath: string): Promise<void> {
   if (snapshots.has(filePath)) {
@@ -48,8 +52,26 @@ async function restoreFile(filePath: string): Promise<void> {
   await fs.writeFile(filePath, snapshot.content, 'utf8');
 }
 
+function getSnapshotPaths(): string[] {
+  return [
+    repository.getWhitelistPath(),
+    repository.getQuarantinePath(),
+    repository.getItemsPath(),
+    repository.getSkillsPath(),
+    repository.getMcpsPath(),
+    getSyncStatePath()
+  ];
+}
+
+function getPerTestRestorePaths(): string[] {
+  return [repository.getWhitelistPath(), repository.getQuarantinePath()];
+}
+
 beforeAll(async () => {
-  await Promise.all(SNAPSHOT_PATHS.map((filePath) => snapshotFile(filePath)));
+  previousToolkitHome = process.env.TOOLKIT_HOME;
+  process.env.TOOLKIT_HOME = TOOLKIT_HOME;
+
+  await Promise.all(getSnapshotPaths().map((filePath) => snapshotFile(filePath)));
 
   const prevOffline = process.env.SKILLS_MCPS_SYNC_OFFLINE;
   const prevToday = process.env.SKILLS_MCPS_SYNC_TODAY;
@@ -72,11 +94,19 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  await Promise.all(PER_TEST_RESTORE_PATHS.map((filePath) => restoreFile(filePath)));
+  await Promise.all(getPerTestRestorePaths().map((filePath) => restoreFile(filePath)));
 });
 
 afterAll(async () => {
-  await Promise.all(SNAPSHOT_PATHS.map((filePath) => restoreFile(filePath)));
+  await Promise.all(getSnapshotPaths().map((filePath) => restoreFile(filePath)));
+
+  if (previousToolkitHome === undefined) {
+    delete process.env.TOOLKIT_HOME;
+  } else {
+    process.env.TOOLKIT_HOME = previousToolkitHome;
+  }
+
+  await fs.rm(TOOLKIT_HOME, { recursive: true, force: true });
 });
 
 describe('integration flow', () => {
@@ -104,7 +134,7 @@ describe('integration flow', () => {
   it('quarantines failed whitelist entries from verification report', async () => {
     const { reportPath, report } = await verifyWhitelist();
     const outcome = await applyQuarantineFromReport(reportPath);
-    const whitelist = await loadWhitelist();
+    const whitelist = await repository.loadWhitelist();
 
     expect(Array.isArray(report.staleRegistries)).toBe(true);
     expect(outcome.quarantined).toBeDefined();

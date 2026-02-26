@@ -1,4 +1,7 @@
+import fs from 'fs-extra';
+
 import { readJsonFile } from '../lib/json.js';
+import { getPackagePath, getStatePath } from '../lib/paths.js';
 import type { McpRecord, SkillRecord } from '../models/records.js';
 import { McpSchema, SkillSchema } from '../models/records.js';
 
@@ -12,7 +15,7 @@ interface ValidationResult<T> {
 
 export async function validateCuratedSkills(): Promise<ValidationResult<SkillRecord>> {
   try {
-    const raw = await readJsonFile<unknown[]>('data/curated/skills.json');
+    const raw = await loadCuratedArray('data/curated/skills.json');
     const parsed = raw.map((entry, index) => {
       try {
         return SkillSchema.parse(entry);
@@ -42,7 +45,7 @@ export async function validateCuratedMcps(
   skillIds: Set<string>
 ): Promise<ValidationResult<McpRecord>> {
   try {
-    const raw = await readJsonFile<unknown[]>('data/curated/mcps.json');
+    const raw = await loadCuratedArray('data/curated/mcps.json');
     const parsed = raw.map((entry, index) => {
       try {
         const record = McpSchema.parse(entry);
@@ -71,4 +74,13 @@ export async function validateCuratedMcps(
       errors: [error instanceof Error ? error.message : String(error)]
     };
   }
+}
+
+async function loadCuratedArray(relativePath: string): Promise<unknown[]> {
+  const statePath = getStatePath(relativePath);
+  if (await fs.pathExists(statePath)) {
+    return readJsonFile<unknown[]>(statePath);
+  }
+
+  return readJsonFile<unknown[]>(getPackagePath(relativePath));
 }

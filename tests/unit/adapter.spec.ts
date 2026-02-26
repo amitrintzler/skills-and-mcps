@@ -190,4 +190,63 @@ describe('adaptRegistryEntries', () => {
       })
     ]);
   });
+
+  it('maps GitHub marketplace plugin entries', () => {
+    const registry = RegistrySchema.parse({
+      id: 'github-copilot-plugins-official',
+      kind: 'copilot-extension',
+      sourceType: 'vendor-feed',
+      adapter: 'copilot-plugin-marketplace-v1',
+      enabled: true,
+      entries: []
+    });
+
+    const result = adaptRegistryEntries(registry, [
+      {
+        name: 'Actions Copilot',
+        description: 'Workflow and CI/CD assistant',
+        source: 'https://github.com/github/actions-copilot-extension',
+        version: '1.2.3',
+        skills: [{ name: 'workflow', commands: ['deploy'] }]
+      }
+    ]);
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        id: 'copilot-extension:actions-copilot',
+        kind: 'copilot-extension',
+        provider: 'github',
+        metadata: expect.objectContaining({
+          catalogType: 'plugin',
+          sourceConfidence: 'official'
+        })
+      })
+    ]);
+  });
+
+  it('maps Claude connector entries scraped from connectors page HTML', () => {
+    const registry = RegistrySchema.parse({
+      id: 'anthropic-claude-connectors-scrape',
+      kind: 'claude-plugin',
+      sourceType: 'vendor-feed',
+      adapter: 'claude-connectors-scrape-v1',
+      enabled: true,
+      entries: []
+    });
+
+    const html = '<a href="/connectors/asana"><span>Asana</span></a>';
+    const result = adaptRegistryEntries(registry, [html]);
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        id: 'claude-plugin:asana',
+        kind: 'claude-plugin',
+        provider: 'anthropic',
+        metadata: expect.objectContaining({
+          catalogType: 'connector',
+          sourceConfidence: 'scraped'
+        })
+      })
+    ]);
+  });
 });

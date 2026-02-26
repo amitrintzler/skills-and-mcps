@@ -67,7 +67,9 @@ function rankCandidate(
     candidate.adoptionSignal * (rankingPolicy.weights.adoption / 100);
 
   const freshnessBonus = (candidate.freshnessSignal / 100) * rankingPolicy.weights.freshnessBonusMax;
-  const securityPenalty = (assessment.riskScore / 100) * rankingPolicy.weights.securityPenaltyMax;
+  const baseSecurityPenalty = (assessment.riskScore / 100) * rankingPolicy.weights.securityPenaltyMax;
+  const sourcePenalty = computeSourcePenalty(candidate);
+  const securityPenalty = Math.min(100, baseSecurityPenalty + sourcePenalty);
 
   const blockedByPolicy = isBlockedTier(assessment.riskTier, securityPolicy);
   const blockedByQuarantine = quarantinedIds.has(candidate.id);
@@ -85,7 +87,8 @@ function rankCandidate(
     `Repo evidence signals: ${projectSignals.scanEvidence.length}`,
     `Maintenance signal: ${candidate.maintenanceSignal}`,
     `Provenance signal: ${candidate.provenanceSignal}`,
-    `Adoption signal: ${candidate.adoptionSignal}`
+    `Adoption signal: ${candidate.adoptionSignal}`,
+    sourcePenalty > 0 ? `Source confidence penalty: ${round(sourcePenalty)}` : 'Source confidence penalty: 0'
   ];
 
   const blockReason = blockedByQuarantine
@@ -161,4 +164,26 @@ function dedupe(values: string[]): string[] {
 
 function round(value: number): number {
   return Math.round(value * 10) / 10;
+}
+
+function computeSourcePenalty(candidate: CatalogItem): number {
+  const metadata =
+    candidate.metadata && typeof candidate.metadata === 'object' && !Array.isArray(candidate.metadata)
+      ? (candidate.metadata as Record<string, unknown>)
+      : {};
+
+  let penalty = 0;
+
+  const sourceType = typeof metadata.sourceType === 'string' ? metadata.sourceType : '';
+  if (sourceType === 'community-list') {
+    penalty += 6;
+  }
+
+  const catalogType = typeof metadata.catalogType === 'string' ? metadata.catalogType : '';
+  const confidence = typeof metadata.sourceConfidence === 'string' ? metadata.sourceConfidence : '';
+  if (catalogType === 'connector' && confidence === 'scraped') {
+    penalty += 8;
+  }
+
+  return penalty;
 }

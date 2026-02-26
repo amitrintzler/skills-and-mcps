@@ -6,6 +6,7 @@ interface FetchLikeResponse {
   status: number;
   statusText: string;
   json(): Promise<unknown>;
+  text?(): Promise<string>;
 }
 
 interface FetchLike {
@@ -16,6 +17,14 @@ export interface ResolvedRegistryEntries {
   entries: unknown[];
   source: 'remote' | 'local';
 }
+
+const SAFE_REMOTE_HOSTS = [
+  'claude.com',
+  'www.anthropic.com',
+  'raw.githubusercontent.com',
+  'github.com',
+  'registry.modelcontextprotocol.io'
+];
 
 export async function resolveRegistryEntries(
   registry: Registry,
@@ -74,6 +83,8 @@ export async function fetchRemoteRegistryEntries(
     throw new Error(`Registry ${registry.id} has no remote definition`);
   }
 
+  validateRemoteHost(registry);
+
   const allEntries: unknown[] = [];
   let cursor: string | undefined;
 
@@ -101,7 +112,7 @@ async function fetchRemoteRegistryPayload(
   }
 
   const headers: Record<string, string> = {
-    Accept: 'application/json'
+    Accept: remote.format === 'html' ? 'text/html' : 'application/json'
   };
 
   if (remote.authEnv) {
@@ -129,6 +140,13 @@ async function fetchRemoteRegistryPayload(
       );
     }
 
+    if (remote.format === 'html') {
+      if (!response.text) {
+        throw new Error(`Remote registry ${registry.id} expected text() response handler`);
+      }
+      return response.text();
+    }
+
     return response.json();
   } finally {
     clearTimeout(timer);
@@ -146,6 +164,13 @@ export function extractEntries(
       throw new Error('Expected remote payload to be an array');
     }
     return payload;
+  }
+
+  if (format === 'html') {
+    if (typeof payload !== 'string') {
+      throw new Error('Expected remote payload to be a string for html format');
+    }
+    return [payload];
   }
 
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
@@ -226,4 +251,34 @@ function summarizeError(error: unknown): string {
     return error.message;
   }
   return 'unknown error';
+}
+
+function validateRemoteHost(registry: Registry): void {
+  if (!registry.remote || !requiresSafeHostAllowlist(registry.kind)) {
+    return;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(registry.remote.url);
+  } catch {
+    throw new Error(`Remote registry ${registry.id} has invalid URL: ${registry.remote.url}`);
+  }
+
+  if (url.protocol !== 'https:') {
+    throw new Error(`Remote registry ${registry.id} rejected non-HTTPS endpoint: ${registry.remote.url}`);
+  }
+
+  const hostname = url.hostname.toLowerCase();
+  const allowed = SAFE_REMOTE_HOSTS.includes(hostname);
+
+  if (!allowed) {
+    throw new Error(
+      `Remote registry ${registry.id} host ${hostname} is not in safe host allowlist`
+    );
+  }
+}
+
+function requiresSafeHostAllowlist(kind: Registry['kind']): boolean {
+  return kind === 'claude-plugin' || kind === 'copilot-extension' || kind === 'mcp';
 }

@@ -23,6 +23,20 @@ describe('cli formatters', () => {
     expect(output).toContain('skill:abc');
   });
 
+  it('wraps long cell values when wrap mode is enabled', () => {
+    const output = renderTable(
+      [
+        { key: 'id', header: 'ID', width: 10 },
+        { key: 'kind', header: 'TYPE', width: 8 }
+      ],
+      [{ id: 'claude-plugin:very-long-entry', kind: 'claude-plugin' }],
+      { wrap: true }
+    );
+
+    expect(output).toContain('claude-plu');
+    expect(output).toContain('gin:very-l');
+  });
+
   it('renders csv and markdown deterministically', () => {
     const headers = ['id', 'kind'];
     const rows = [['skill:abc', 'skill']];

@@ -77,3 +77,39 @@ export function toCount(value: unknown): number {
   }
   return Math.floor(parsed);
 }
+
+export function slugify(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function stripHtml(value: string, maxLength = 240): string {
+  const withoutTags = value.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ');
+  const normalized = withoutTags.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  return normalized.slice(0, maxLength);
+}
+
+export function sanitizeUrl(value: string | undefined, allowedHosts: string[]): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    const parsed = new URL(value.trim());
+    if (parsed.protocol !== 'https:') {
+      return undefined;
+    }
+
+    const hostname = parsed.hostname.toLowerCase();
+    if (!allowedHosts.some((host) => hostname === host || hostname.endsWith(`.${host}`))) {
+      return undefined;
+    }
+
+    return parsed.toString();
+  } catch {
+    return undefined;
+  }
+}

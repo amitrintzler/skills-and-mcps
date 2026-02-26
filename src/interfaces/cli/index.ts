@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { createInterface } from 'node:readline/promises';
+import { spawn } from 'node:child_process';
 import { stdin, stdout } from 'node:process';
 
 import { loadItemInsights, loadRegistries, loadSecurityPolicy } from '../../config/runtime.js';
@@ -9,6 +10,7 @@ import { getStaleRegistries, loadSyncState } from '../../catalog/sync-state.js';
 import { loadCatalogItemById, loadCatalogItems, loadQuarantine, loadWhitelist } from '../../catalog/repository.js';
 import { installWithSkillSh } from '../../install/skillsh.js';
 import { logger } from '../../lib/logger.js';
+import { getPackagePath } from '../../lib/paths.js';
 import { CatalogKindSchema, type CatalogItem, type CatalogKind, type Recommendation } from '../../lib/validation/contracts.js';
 import { detectProjectSignals } from '../../recommendation/project-analysis.js';
 import { recommend } from '../../recommendation/engine.js';
@@ -23,6 +25,14 @@ import { colorRisk, colors } from './formatters/colors.js';
 import { renderTable, scoreBar } from './formatters/table.js';
 import { printHint, printJson } from './output.js';
 import { hasFlag, readCsvList, readFlag, readKinds, readLimit, readSort, type SortKey } from './options.js';
+import { renderHomeScreen } from './ui/home.js';
+import { writeWebReport } from './ui/web-report.js';
+import {
+  checkForUpdateNow,
+  maybeNotifyAboutUpdate,
+  RELEASE_DOWNLOAD_URL,
+  type UpdateCheckResult
+} from './update-check.js';
 
 interface LocalCliConfig {
   defaultKinds: CatalogKind[];
@@ -33,72 +43,95 @@ interface LocalCliConfig {
 }
 
 export async function runCli(argv: string[]): Promise<void> {
-  const [command = 'help', ...rest] = argv;
+  const noUpdateCheck = hasFlag(argv, '--no-update-check');
+  const filtered = argv.filter((arg) => arg !== '--no-update-check');
+  const [command = 'home', ...rest] = filtered;
 
   switch (command) {
+    case 'home':
+      await handleHome();
+      break;
     case 'about':
       await handleAbout();
-      return;
+      break;
     case 'status':
       await handleStatus(rest);
-      return;
+      break;
     case 'init':
       await handleInit(rest);
-      return;
+      break;
     case 'doctor':
       await handleDoctor(rest);
-      return;
+      break;
     case 'list':
       await handleList(rest);
-      return;
+      break;
     case 'show':
       await handleShow(rest);
-      return;
+      break;
     case 'search':
       await handleSearch(rest);
-      return;
+      break;
     case 'explain':
       await handleExplain(rest);
-      return;
+      break;
     case 'scan':
       await handleScan(rest);
-      return;
+      break;
     case 'top':
       await handleTop(rest);
-      return;
+      break;
     case 'sync':
       await handleSync(rest);
-      return;
+      break;
     case 'recommend':
       await handleRecommend(rest);
-      return;
+      break;
+    case 'web':
+      await handleWeb(rest);
+      break;
     case 'assess':
       await handleAssess(rest);
-      return;
+      break;
     case 'install':
       await handleInstall(rest);
-      return;
+      break;
     case 'whitelist':
       await handleWhitelist(rest);
-      return;
+      break;
     case 'quarantine':
       await handleQuarantine(rest);
-      return;
+      break;
+    case 'upgrade':
+      await handleUpgrade(rest);
+      break;
     case 'help':
+      printHelp();
+      break;
     default:
       printHelp();
+      break;
+  }
+
+  if (command !== 'help' && command !== 'upgrade') {
+    await maybeNotifyAboutUpdate({ disableAutoCheck: noUpdateCheck });
   }
 }
 
+async function handleHome(): Promise<void> {
+  const output = await renderHomeScreen();
+  console.log(output);
+}
+
 async function handleAbout(): Promise<void> {
-  const packageRaw = await fs.readFile(path.resolve('package.json'), 'utf8');
+  const packageRaw = await fs.readFile(getPackagePath('package.json'), 'utf8');
   const pkg = JSON.parse(packageRaw) as { name?: string; version?: string; description?: string };
 
   console.log(`${pkg.name ?? 'toolkit'} v${pkg.version ?? '0.0.0'}`);
   if (pkg.description) {
     console.log(pkg.description);
   }
-  console.log('Scope: skills, MCP servers, Claude plugins, Copilot extensions');
+  console.log('Scope: Claude plugins, Copilot extensions, Skills, MCP servers');
   console.log('Ranking: trust-first (fit + trust - risk penalties + freshness bonus)');
   console.log('Sources: official-first provider registries with local fallback');
 }
@@ -139,11 +172,14 @@ async function handleStatus(args: string[]): Promise<void> {
 
   if (verbose) {
     console.log('\nRegistry Sync State');
-    Object.entries(syncState.registries)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .forEach(([id, state]) => {
+    const entries = Object.entries(syncState.registries).sort((a, b) => a[0].localeCompare(b[0]));
+    if (entries.length === 0) {
+      console.log('- none yet');
+    } else {
+      entries.forEach(([id, state]) => {
         console.log(`- ${id}: lastSuccessfulSyncAt=${state.lastSuccessfulSyncAt ?? 'n/a'}, updatedSince=${state.lastUpdatedSince ?? 'n/a'}`);
       });
+    }
 
     const risks = items
       .map((item) => ({ id: item.id, assessment: buildAssessment(item, policy) }))
@@ -161,13 +197,10 @@ async function handleInit(args: string[]): Promise<void> {
   const project = readFlag(args, '--project') ?? '.';
   const root = path.resolve(project);
 
-  const [signals, items] = await Promise.all([detectProjectSignals(root), loadCatalogItems()]);
+  const [items, policy] = await Promise.all([loadCatalogItems(), loadSecurityPolicy()]);
   const providers = Array.from(new Set(items.map((item) => item.provider))).sort((a, b) => a.localeCompare(b));
 
-  let defaultKinds: CatalogKind[] = ['skill', 'mcp'];
-  if (signals.stack.includes('node')) {
-    defaultKinds = ['skill', 'mcp', 'copilot-extension'];
-  }
+  const defaultKinds: CatalogKind[] = ['skill', 'mcp', 'claude-plugin', 'copilot-extension'];
 
   const defaults: LocalCliConfig = {
     defaultKinds,
@@ -199,7 +232,9 @@ async function handleInit(args: string[]): Promise<void> {
           .filter((v) => v.length > 0);
       }
 
-      const riskAnswer = await rl.question('Risk posture [balanced|strict] (default balanced): ');
+      const riskAnswer = await rl.question(
+        'Risk posture [balanced|strict] (default balanced; strict hides blocked/high-risk by default): '
+      );
       if (riskAnswer.trim() === 'strict') {
         defaults.riskPosture = 'strict';
       }
@@ -224,6 +259,10 @@ async function handleInit(args: string[]): Promise<void> {
   await fs.writeFile(file, `${JSON.stringify(defaults, null, 2)}\n`, 'utf8');
 
   console.log(`Initialized local CLI config: ${file}`);
+  console.log(`Risk scale (lower is safer): ${formatRiskScale(policy)}`);
+  console.log(
+    `Risk posture "${defaults.riskPosture}": ${describeRiskPosture(defaults.riskPosture)}`
+  );
   printHint('Run `npm run dev -- doctor` to verify local setup.');
 }
 
@@ -268,8 +307,16 @@ async function handleList(args: string[]): Promise<void> {
   const limit = readLimit(args, 50);
   const sort = readSort(args, 'name');
   const format = readFlag(args, '--format') ?? 'table';
+  const readable = hasFlag(args, '--readable');
+  const details = hasFlag(args, '--details');
 
-  const [items, quarantine, policy] = await Promise.all([loadCatalogItems(), loadQuarantine(), loadSecurityPolicy()]);
+  const [items, quarantine, policy, localConfig, insights] = await Promise.all([
+    loadCatalogItems(),
+    loadQuarantine(),
+    loadSecurityPolicy(),
+    loadLocalCliConfig(path.resolve('.')),
+    loadItemInsights()
+  ]);
   const quarantined = new Set(quarantine.map((entry) => entry.id));
 
   let filtered = items.map((item) => {
@@ -302,6 +349,8 @@ async function handleList(args: string[]): Promise<void> {
   if (blockedFilter) {
     const required = blockedFilter === 'true';
     filtered = filtered.filter((entry) => entry.blocked === required);
+  } else if (localConfig?.riskPosture === 'strict') {
+    filtered = filtered.filter((entry) => !entry.blocked);
   }
 
   if (riskTierFilter) {
@@ -316,6 +365,9 @@ async function handleList(args: string[]): Promise<void> {
         id: entry.item.id,
         kind: entry.item.kind,
         provider: entry.item.provider,
+        source: entry.item.source,
+        catalogType: getCatalogType(entry.item),
+        sourceConfidence: getSourceConfidence(entry.item),
         riskTier: entry.assessment.riskTier,
         riskScore: entry.assessment.riskScore,
         blocked: entry.blocked
@@ -327,9 +379,12 @@ async function handleList(args: string[]): Promise<void> {
   console.log(
     renderTable(
       [
-        { key: 'id', header: 'ID', width: 32 },
+        { key: 'id', header: 'ID', width: readable ? 42 : 32 },
         { key: 'kind', header: 'TYPE', width: 18 },
-        { key: 'provider', header: 'PROVIDER', width: 12 },
+        { key: 'provider', header: 'PROVIDER', width: 10 },
+        { key: 'source', header: 'SOURCE', width: readable ? 34 : 24 },
+        { key: 'catalogType', header: 'CATALOG', width: 10 },
+        { key: 'confidence', header: 'CONFIDENCE', width: 14 },
         { key: 'risk', header: 'RISK', width: 12 },
         { key: 'blocked', header: 'BLOCKED', width: 8 }
       ],
@@ -337,13 +392,24 @@ async function handleList(args: string[]): Promise<void> {
         id: entry.item.id,
         kind: entry.item.kind,
         provider: entry.item.provider,
+        source: entry.item.source,
+        catalogType: getCatalogType(entry.item),
+        confidence: getSourceConfidence(entry.item),
         risk: `${entry.assessment.riskTier}(${entry.assessment.riskScore.toFixed(0)})`,
         blocked: String(entry.blocked)
-      }))
+      })),
+      { wrap: readable }
     )
   );
 
+  printHint(`Risk scale (lower is safer): ${formatRiskScale(policy)}`);
+  if (!blockedFilter && localConfig?.riskPosture === 'strict') {
+    printHint('Strict risk posture is active: blocked/high-risk entries are hidden. Use `--blocked true` to inspect them.');
+  }
   printHint('Use `show --id <catalog-id>` for full detail.');
+  if (details) {
+    console.log(renderCatalogDecisionDetails(filtered, policy, insights));
+  }
 }
 
 async function handleShow(args: string[]): Promise<void> {
@@ -380,7 +446,19 @@ async function handleShow(args: string[]): Promise<void> {
     }
   });
 
-  printHint(`Install with: npm run dev -- install --id ${item.id} --yes`);
+  printHint(`Install with: toolkit install --id ${item.id} --yes`);
+  console.log(
+    `Provenance: source=${item.source} catalogType=${getCatalogType(item)} confidence=${getSourceConfidence(item)}`
+  );
+  const metadata = getItemMetadata(item);
+  const sourceRepo = typeof metadata.sourceRepo === 'string' ? metadata.sourceRepo : undefined;
+  const sourcePage = typeof metadata.sourcePage === 'string' ? metadata.sourcePage : undefined;
+  if (sourceRepo) {
+    console.log(`Source repo: ${sourceRepo}`);
+  }
+  if (sourcePage) {
+    console.log(`Source page: ${sourcePage}`);
+  }
 }
 
 async function handleSearch(args: string[]): Promise<void> {
@@ -549,17 +627,26 @@ async function handleTop(args: string[]): Promise<void> {
   const kinds = readKinds(args);
   const limit = readLimit(args, 10) ?? 10;
   const llm = hasFlag(args, '--llm');
+  const readable = hasFlag(args, '--readable');
+  const details = hasFlag(args, '--details');
 
-  const [projectSignals, requirements] = await Promise.all([
+  const [projectSignals, requirements, policy] = await Promise.all([
     detectProjectSignals(path.resolve(project), { llm }),
-    loadRequirementsProfile(requirementsFile)
+    loadRequirementsProfile(requirementsFile),
+    loadSecurityPolicy()
   ]);
 
   const ranked = await recommend({ projectSignals, requirements, kinds });
   const safe = ranked.filter((entry) => !entry.blocked).slice(0, limit);
 
-  renderRecommendationsTable(safe, 'table');
+  renderRecommendationsTable(safe, 'table', readable);
+  printHint(`Risk scale (lower is safer): ${formatRiskScale(policy)}`);
   printHint('Use `show --id <catalog-id>` or `assess --id <catalog-id>` for deep inspection.');
+  if (details) {
+    const [catalogItems, insights] = await Promise.all([loadCatalogItems(), loadItemInsights()]);
+    const catalogMap = new Map(catalogItems.map((item) => [item.id, item]));
+    console.log(renderRecommendationDecisionDetails(safe, catalogMap, policy, insights));
+  }
 }
 
 async function handleSync(args: string[]): Promise<void> {
@@ -591,17 +678,27 @@ async function handleRecommend(args: string[]): Promise<void> {
   const kinds = readKinds(args);
   const providers = readCsvList(args, '--provider');
   const limit = readLimit(args);
-  const onlySafe = hasFlag(args, '--only-safe');
+  let onlySafe = hasFlag(args, '--only-safe');
   const sort = readSort(args);
   const exportFormat = readFlag(args, '--export');
   const exportPath = readFlag(args, '--out');
   const explainScan = hasFlag(args, '--explain-scan');
   const llm = hasFlag(args, '--llm');
+  const readable = hasFlag(args, '--readable');
+  const details = hasFlag(args, '--details');
+  const projectRoot = path.resolve(project);
 
-  const [projectSignals, requirements] = await Promise.all([
-    detectProjectSignals(path.resolve(project), { llm }),
-    loadRequirementsProfile(requirementsFile)
+  const [projectSignals, requirements, policy, localConfig] = await Promise.all([
+    detectProjectSignals(projectRoot, { llm }),
+    loadRequirementsProfile(requirementsFile),
+    loadSecurityPolicy(),
+    loadLocalCliConfig(projectRoot)
   ]);
+
+  if (!onlySafe && localConfig?.riskPosture === 'strict') {
+    onlySafe = true;
+    printHint('Strict risk posture is active: recommendations default to safe items only.');
+  }
 
   if (explainScan) {
     const previewEvidence = projectSignals.scanEvidence.slice(0, 12);
@@ -644,7 +741,17 @@ async function handleRecommend(args: string[]): Promise<void> {
   if (format === 'json') {
     console.log(renderJson(ranked));
   } else {
-    renderRecommendationsTable(ranked, format);
+    renderRecommendationsTable(ranked, format, readable);
+    printHint(`Risk scale (lower is safer): ${formatRiskScale(policy)}`);
+    if (details) {
+      const [catalogItems, insights] = await Promise.all([loadCatalogItems(), loadItemInsights()]);
+      const catalogMap = new Map(catalogItems.map((item) => [item.id, item]));
+      console.log(renderRecommendationDecisionDetails(ranked, catalogMap, policy, insights));
+    }
+  }
+
+  if (details && format === 'json') {
+    printHint('Detailed decision view is available in table mode: rerun with `--format table --details`.');
   }
 
   if (exportFormat) {
@@ -658,6 +765,30 @@ async function handleRecommend(args: string[]): Promise<void> {
   printHint('Next: run `show --id <catalog-id>` or `install --id <catalog-id> --yes`.');
 }
 
+async function handleWeb(args: string[]): Promise<void> {
+  const out = readFlag(args, '--out') ?? '.toolkit/report.html';
+  const limit = readLimit(args, 400) ?? 400;
+  const kinds = readKinds(args);
+  const open = hasFlag(args, '--open');
+
+  const result = await writeWebReport({
+    outputPath: out,
+    kinds,
+    limit
+  });
+  console.log(`Web report written: ${result.outputPath}`);
+  console.log(`Items included: ${result.items}`);
+
+  if (open) {
+    const opened = await openInBrowser(result.outputPath);
+    if (!opened) {
+      printHint(`Unable to auto-open browser. Open manually: ${result.outputPath}`);
+    }
+  } else {
+    printHint(`Open in browser: ${result.outputPath}`);
+  }
+}
+
 async function handleAssess(args: string[]): Promise<void> {
   const id = readFlag(args, '--id');
   if (!id) {
@@ -669,8 +800,9 @@ async function handleAssess(args: string[]): Promise<void> {
     throw new Error(`Catalog item not found: ${id}`);
   }
 
-  const assessment = await assessRisk(found);
+  const [assessment, policy] = await Promise.all([assessRisk(found), loadSecurityPolicy()]);
   console.log(renderJson(assessment));
+  printHint(`Risk scale (lower is safer): ${formatRiskScale(policy)}`);
 }
 
 async function handleInstall(args: string[]): Promise<void> {
@@ -721,6 +853,40 @@ async function handleQuarantine(args: string[]): Promise<void> {
   console.log(renderJson(result));
 }
 
+async function handleUpgrade(args: string[]): Promise<void> {
+  const subcommand = args[0] ?? 'check';
+  if (subcommand !== 'check') {
+    throw new Error('Usage: upgrade check');
+  }
+
+  const result = await checkForUpdateNow();
+  renderUpgradeResult(result);
+}
+
+function renderUpgradeResult(result: UpdateCheckResult): void {
+  if (result.status === 'no-release') {
+    console.log('No published release found yet.');
+    console.log(`Releases: ${RELEASE_DOWNLOAD_URL}`);
+    return;
+  }
+
+  if (result.status === 'error') {
+    console.log('Unable to check for updates right now.');
+    console.log(`Releases: ${RELEASE_DOWNLOAD_URL}`);
+    return;
+  }
+
+  if (result.status === 'up-to-date') {
+    console.log(`Toolkit is up to date (v${result.currentVersion}).`);
+    console.log(`Latest release: v${result.latestVersion}`);
+    console.log(`Releases: ${RELEASE_DOWNLOAD_URL}`);
+    return;
+  }
+
+  console.log(`New Toolkit version available: v${result.currentVersion} -> v${result.latestVersion}`);
+  console.log(`Download: ${RELEASE_DOWNLOAD_URL}`);
+}
+
 function sortRecommendations(recommendations: Recommendation[], sort: SortKey): Recommendation[] {
   const sorted = [...recommendations];
 
@@ -768,7 +934,7 @@ function sortCatalogRows<T extends { item: CatalogItem; assessment: { riskScore:
   return copy.sort((a, b) => a.item.id.localeCompare(b.item.id));
 }
 
-function renderRecommendationsTable(recommendations: Recommendation[], format: string): void {
+function renderRecommendationsTable(recommendations: Recommendation[], format: string, readable = false): void {
   if (format !== 'table') {
     console.log(renderJson(recommendations));
     return;
@@ -791,7 +957,7 @@ function renderRecommendationsTable(recommendations: Recommendation[], format: s
   console.log(
     renderTable(
       [
-        { key: 'id', header: 'ID', width: 32 },
+        { key: 'id', header: 'ID', width: readable ? 42 : 32 },
         { key: 'kind', header: 'TYPE', width: 18 },
         { key: 'provider', header: 'PROVIDER', width: 10 },
         { key: 'rank', header: 'RANK', width: 18 },
@@ -800,7 +966,8 @@ function renderRecommendationsTable(recommendations: Recommendation[], format: s
         { key: 'risk', header: 'RISK', width: 16 },
         { key: 'blocked', header: 'BLOCKED', width: 8 }
       ],
-      rows
+      rows,
+      { wrap: readable }
     )
   );
 }
@@ -859,21 +1026,218 @@ function computeSearchScore(item: CatalogItem, query: string): number {
 }
 
 function printHelp(): void {
-  logger.info('Commands:');
-  logger.info('  about');
-  logger.info('  init [--project .]');
-  logger.info('  doctor [--project .]');
-  logger.info('  status [--verbose]');
-  logger.info('  sync [--kind skill,mcp,claude-plugin,copilot-extension] [--dry-run]');
-  logger.info('  list [--kind ...] [--provider ...] [--risk-tier low|medium|high|critical] [--blocked true|false] [--search q] [--limit n] [--sort name|risk|trust] [--format json|table]');
-  logger.info('  search <query>');
-  logger.info('  explain [--kind ...] [--provider ...] [--limit n] [--format json|table]');
-  logger.info('  scan [--project .] [--format table|json] [--out scan-report.json] [--llm]');
-  logger.info('  show --id <catalog-id>');
-  logger.info('  top [--project .] [--requirements requirements.yml] [--kind ...] [--limit n] [--llm]');
-  logger.info('  recommend --project . --requirements requirements.yml --format json|table [--kind ...] [--provider ...] [--limit n] [--sort score|trust|risk|fit|name] [--only-safe] [--explain-scan] [--llm] [--export csv|md --out file]');
-  logger.info('  assess --id <catalog-id>');
-  logger.info('  install --id <catalog-id> [--yes] [--override-risk]');
-  logger.info('  whitelist verify');
-  logger.info('  quarantine apply --report <path>');
+  console.log('Commands:');
+  console.log('  about');
+  console.log('  init [--project .]');
+  console.log('  doctor [--project .]');
+  console.log('  status [--verbose]');
+  console.log('  sync [--kind skill,mcp,claude-plugin,copilot-extension] [--dry-run]');
+  console.log('  list [--kind ...] [--provider ...] [--risk-tier low|medium|high|critical] [--blocked true|false] [--search q] [--limit n] [--sort name|risk|trust] [--format json|table] [--readable] [--details]');
+  console.log('  search <query>');
+  console.log('  explain [--kind ...] [--provider ...] [--limit n] [--format json|table]');
+  console.log('  scan [--project .] [--format table|json] [--out scan-report.json] [--llm]');
+  console.log('  show --id <catalog-id>');
+  console.log('  top [--project .] [--requirements requirements.yml] [--kind ...] [--limit n] [--llm] [--readable] [--details]');
+  console.log('  recommend --project . --requirements requirements.yml --format json|table [--kind ...] [--provider ...] [--limit n] [--sort score|trust|risk|fit|name] [--only-safe] [--explain-scan] [--llm] [--export csv|md --out file] [--readable] [--details]');
+  console.log('  web [--out .toolkit/report.html] [--kind ...] [--limit n] [--open]');
+  console.log('  assess --id <catalog-id>');
+  console.log('  install --id <catalog-id> [--yes] [--override-risk]');
+  console.log('  whitelist verify');
+  console.log('  quarantine apply --report <path>');
+  console.log('  upgrade check');
+  console.log('');
+  console.log('Global options:');
+  console.log('  --no-update-check');
+}
+
+async function loadLocalCliConfig(projectRoot: string): Promise<LocalCliConfig | null> {
+  const configPath = path.join(projectRoot, '.skills-mcps.json');
+  try {
+    const raw = await fs.readFile(configPath, 'utf8');
+    const parsed = JSON.parse(raw) as Partial<LocalCliConfig>;
+    if (parsed.riskPosture !== 'balanced' && parsed.riskPosture !== 'strict') {
+      return null;
+    }
+
+    return {
+      defaultKinds: Array.isArray(parsed.defaultKinds) ? parsed.defaultKinds : ['skill', 'mcp', 'claude-plugin', 'copilot-extension'],
+      defaultProviders: Array.isArray(parsed.defaultProviders) ? parsed.defaultProviders : [],
+      riskPosture: parsed.riskPosture,
+      outputStyle: parsed.outputStyle === 'json' ? 'json' : 'rich-table',
+      initializedAt: typeof parsed.initializedAt === 'string' ? parsed.initializedAt : new Date().toISOString()
+    };
+  } catch {
+    return null;
+  }
+}
+
+function formatRiskScale(policy: Awaited<ReturnType<typeof loadSecurityPolicy>>): string {
+  const low = policy.thresholds.lowMax;
+  const medium = policy.thresholds.mediumMax;
+  const high = policy.thresholds.highMax;
+  const critical = policy.thresholds.criticalMax;
+
+  return `low 0-${low}, medium ${low + 1}-${medium}, high ${medium + 1}-${high}, critical ${high + 1}-${critical}; install blocks ${policy.installGate.blockTiers.join(', ')}`;
+}
+
+function describeRiskPosture(posture: LocalCliConfig['riskPosture']): string {
+  if (posture === 'strict') {
+    return 'recommend/list flows prefer safe-only results by default.';
+  }
+
+  return 'show full catalog/recommendation set, including blocked items with flags.';
+}
+
+function renderCatalogDecisionDetails(
+  rows: Array<{
+    item: CatalogItem;
+    assessment: Awaited<ReturnType<typeof assessRisk>>;
+    blocked: boolean;
+  }>,
+  policy: Awaited<ReturnType<typeof loadSecurityPolicy>>,
+  insights: Map<string, Awaited<ReturnType<typeof loadItemInsights>> extends Map<string, infer V> ? V : never>
+): string {
+  if (rows.length === 0) {
+    return '\nDecision details\n- none';
+  }
+
+  const lines: string[] = ['', 'Decision details'];
+  rows.forEach((entry, index) => {
+    const trust = computeTrustSignal(entry.item);
+    const insight = insights.get(entry.item.id);
+    const status = entry.blocked ? 'blocked' : 'allowed';
+    const bestFor = insight?.bestFor.length ? insight.bestFor.join('; ') : 'n/a';
+    const tradeoffs = insight?.tradeoffs.length ? insight.tradeoffs.join('; ') : 'n/a';
+    lines.push(
+      `${index + 1}. ${entry.item.id} | ${entry.item.name}`
+    );
+    lines.push(
+      `   Decision: trust ${trust.toFixed(1)}/100 (${describeTrustBand(trust)}), risk ${entry.assessment.riskScore.toFixed(0)}/100 (${entry.assessment.riskTier}; ${describeRiskBand(entry.assessment.riskScore, policy)}), status ${status}.`
+    );
+    lines.push(`   Why use: ${entry.item.description}`);
+    lines.push(`   Capabilities: ${entry.item.capabilities.join(', ') || 'none'}`);
+    lines.push(
+      `   Provenance: provider=${entry.item.provider}, source=${entry.item.source}, confidence=${getSourceConfidence(entry.item)}, catalogType=${getCatalogType(entry.item)}.`
+    );
+    lines.push(`   Risk reasons: ${entry.assessment.reasons.join('; ')}`);
+    lines.push(`   Best for: ${bestFor}`);
+    lines.push(`   Tradeoffs: ${tradeoffs}`);
+    lines.push(`   Install: toolkit install --id ${entry.item.id} --yes`);
+  });
+
+  return lines.join('\n');
+}
+
+function renderRecommendationDecisionDetails(
+  recommendations: Recommendation[],
+  catalogMap: Map<string, CatalogItem>,
+  policy: Awaited<ReturnType<typeof loadSecurityPolicy>>,
+  insights: Map<string, Awaited<ReturnType<typeof loadItemInsights>> extends Map<string, infer V> ? V : never>
+): string {
+  if (recommendations.length === 0) {
+    return '\nRecommendation details\n- none';
+  }
+
+  const lines: string[] = ['', 'Recommendation details'];
+  recommendations.forEach((entry, index) => {
+    const item = catalogMap.get(entry.id);
+    const insight = insights.get(entry.id);
+    const blockNote = entry.blocked ? entry.blockReason ?? 'Blocked by policy' : 'Not blocked by policy';
+    lines.push(`${index + 1}. ${entry.id}`);
+    lines.push(
+      `   Score: ${entry.rankScore.toFixed(1)} = fit ${entry.scoreBreakdown.fitScore.toFixed(1)} + trust ${entry.scoreBreakdown.trustScore.toFixed(1)} + freshness ${entry.scoreBreakdown.freshnessBonus.toFixed(1)} - security ${entry.scoreBreakdown.securityPenalty.toFixed(1)} - blocked ${entry.scoreBreakdown.blockedPenalty.toFixed(1)}`
+    );
+    lines.push(
+      `   Risk: ${entry.riskScore.toFixed(0)}/100 (${entry.riskTier}; ${describeRiskBand(entry.riskScore, policy)}), ${blockNote}.`
+    );
+    lines.push(`   Why ranked: ${entry.fitReasons.slice(0, 4).join(' | ')}`);
+    if (item) {
+      lines.push(`   Why use: ${item.description}`);
+      lines.push(`   Capabilities: ${item.capabilities.join(', ') || 'none'}`);
+      lines.push(
+        `   Provenance: provider=${item.provider}, source=${item.source}, confidence=${getSourceConfidence(item)}, catalogType=${getCatalogType(item)}.`
+      );
+    }
+    if (insight?.tradeoffs.length) {
+      lines.push(`   Tradeoffs: ${insight.tradeoffs.join('; ')}`);
+    }
+    lines.push(`   Install: toolkit install --id ${entry.id} --yes`);
+  });
+
+  return lines.join('\n');
+}
+
+function computeTrustSignal(item: CatalogItem): number {
+  return (item.maintenanceSignal + item.provenanceSignal + item.adoptionSignal) / 3;
+}
+
+function describeTrustBand(score: number): string {
+  if (score >= 80) {
+    return 'high confidence';
+  }
+  if (score >= 60) {
+    return 'moderate confidence';
+  }
+  return 'needs manual review';
+}
+
+function describeRiskBand(
+  score: number,
+  policy: Awaited<ReturnType<typeof loadSecurityPolicy>>
+): string {
+  if (score <= policy.thresholds.lowMax) {
+    return 'low-risk zone';
+  }
+  if (score <= policy.thresholds.mediumMax) {
+    return 'medium-risk zone';
+  }
+  if (score <= policy.thresholds.highMax) {
+    return 'high-risk zone';
+  }
+  return 'critical-risk zone';
+}
+
+async function openInBrowser(filePath: string): Promise<boolean> {
+  const resolved = path.resolve(filePath);
+  const target = `file://${resolved}`;
+
+  const cmd =
+    process.platform === 'darwin'
+      ? { bin: 'open', args: [target] }
+      : process.platform === 'win32'
+        ? { bin: 'cmd', args: ['/c', 'start', '', target] }
+        : { bin: 'xdg-open', args: [target] };
+
+  try {
+    const child = spawn(cmd.bin, cmd.args, { detached: true, stdio: 'ignore' });
+    child.unref();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getItemMetadata(item: CatalogItem): Record<string, unknown> {
+  if (!item.metadata || typeof item.metadata !== 'object' || Array.isArray(item.metadata)) {
+    return {};
+  }
+  return item.metadata as Record<string, unknown>;
+}
+
+function getCatalogType(item: CatalogItem): string {
+  const metadata = getItemMetadata(item);
+  const value = metadata.catalogType;
+  if (typeof value === 'string' && value.trim().length > 0) {
+    return value;
+  }
+  return 'standard';
+}
+
+function getSourceConfidence(item: CatalogItem): string {
+  const metadata = getItemMetadata(item);
+  const value = metadata.sourceConfidence;
+  if (typeof value === 'string' && value.trim().length > 0) {
+    return value;
+  }
+  return 'official';
 }
