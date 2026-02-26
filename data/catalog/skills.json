@@ -16,7 +16,7 @@
       "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-25",
+    "lastSeenAt": "2026-02-26",
     "install": {
       "kind": "skill.sh",
       "target": "ci-hardening",
@@ -36,6 +36,112 @@
     "metadata": {}
   },
   {
+    "id": "skill:cloudflare-deploy",
+    "kind": "skill",
+    "name": "Cloudflare Deploy",
+    "description": "OpenAI curated Codex skill: cloudflare-deploy.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/cloudflare-deploy",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/cloudflare-deploy"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/cloudflare-deploy",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/cloudflare-deploy"
+    }
+  },
+  {
+    "id": "skill:develop-web-game",
+    "kind": "skill",
+    "name": "Develop Web Game",
+    "description": "OpenAI curated Codex skill: develop-web-game.",
+    "provider": "openai",
+    "capabilities": [
+      "browser-control"
+    ],
+    "compatibility": [
+      "general",
+      "node"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/develop-web-game",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/develop-web-game"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/develop-web-game",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/develop-web-game"
+    }
+  },
+  {
+    "id": "skill:doc",
+    "kind": "skill",
+    "name": "Doc",
+    "description": "OpenAI curated Codex skill: doc.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/doc",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/doc"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/doc",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/doc"
+    }
+  },
+  {
     "id": "skill:docs-automation",
     "kind": "skill",
     "name": "Docs Automation",
@@ -52,7 +158,7 @@
       "python"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-25",
+    "lastSeenAt": "2026-02-26",
     "install": {
       "kind": "skill.sh",
       "target": "docs-automation",
@@ -85,7 +191,7 @@
       "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-25",
+    "lastSeenAt": "2026-02-26",
     "install": {
       "kind": "skill.sh",
       "target": "fast-web-scrape",
@@ -105,6 +211,539 @@
     "metadata": {}
   },
   {
+    "id": "skill:figma",
+    "kind": "skill",
+    "name": "Figma",
+    "description": "OpenAI curated Codex skill: figma.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/figma",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/figma"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/figma",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/figma"
+    }
+  },
+  {
+    "id": "skill:figma-implement-design",
+    "kind": "skill",
+    "name": "Figma Implement Design",
+    "description": "OpenAI curated Codex skill: figma-implement-design.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/figma-implement-design",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/figma-implement-design"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/figma-implement-design",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/figma-implement-design"
+    }
+  },
+  {
+    "id": "skill:gh-address-comments",
+    "kind": "skill",
+    "name": "Gh Address Comments",
+    "description": "OpenAI curated Codex skill: gh-address-comments.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general",
+      "github"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/gh-address-comments",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/gh-address-comments"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/gh-address-comments",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/gh-address-comments"
+    }
+  },
+  {
+    "id": "skill:gh-fix-ci",
+    "kind": "skill",
+    "name": "Gh Fix Ci",
+    "description": "OpenAI curated Codex skill: gh-fix-ci.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general",
+      "github"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/gh-fix-ci",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/gh-fix-ci"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/gh-fix-ci",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/gh-fix-ci"
+    }
+  },
+  {
+    "id": "skill:imagegen",
+    "kind": "skill",
+    "name": "Imagegen",
+    "description": "OpenAI curated Codex skill: imagegen.",
+    "provider": "openai",
+    "capabilities": [
+      "content"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/imagegen",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/imagegen"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/imagegen",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/imagegen"
+    }
+  },
+  {
+    "id": "skill:jupyter-notebook",
+    "kind": "skill",
+    "name": "Jupyter Notebook",
+    "description": "OpenAI curated Codex skill: jupyter-notebook.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/jupyter-notebook",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/jupyter-notebook"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/jupyter-notebook",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/jupyter-notebook"
+    }
+  },
+  {
+    "id": "skill:linear",
+    "kind": "skill",
+    "name": "Linear",
+    "description": "OpenAI curated Codex skill: linear.",
+    "provider": "openai",
+    "capabilities": [
+      "docs"
+    ],
+    "compatibility": [
+      "general",
+      "linear"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/linear",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/linear"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/linear",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/linear"
+    }
+  },
+  {
+    "id": "skill:netlify-deploy",
+    "kind": "skill",
+    "name": "Netlify Deploy",
+    "description": "OpenAI curated Codex skill: netlify-deploy.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/netlify-deploy",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/netlify-deploy"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/netlify-deploy",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/netlify-deploy"
+    }
+  },
+  {
+    "id": "skill:notion-knowledge-capture",
+    "kind": "skill",
+    "name": "Notion Knowledge Capture",
+    "description": "OpenAI curated Codex skill: notion-knowledge-capture.",
+    "provider": "openai",
+    "capabilities": [
+      "docs"
+    ],
+    "compatibility": [
+      "general",
+      "notion"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/notion-knowledge-capture",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/notion-knowledge-capture"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/notion-knowledge-capture",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/notion-knowledge-capture"
+    }
+  },
+  {
+    "id": "skill:notion-meeting-intelligence",
+    "kind": "skill",
+    "name": "Notion Meeting Intelligence",
+    "description": "OpenAI curated Codex skill: notion-meeting-intelligence.",
+    "provider": "openai",
+    "capabilities": [
+      "docs"
+    ],
+    "compatibility": [
+      "general",
+      "notion"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/notion-meeting-intelligence",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/notion-meeting-intelligence"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/notion-meeting-intelligence",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/notion-meeting-intelligence"
+    }
+  },
+  {
+    "id": "skill:notion-research-documentation",
+    "kind": "skill",
+    "name": "Notion Research Documentation",
+    "description": "OpenAI curated Codex skill: notion-research-documentation.",
+    "provider": "openai",
+    "capabilities": [
+      "docs"
+    ],
+    "compatibility": [
+      "general",
+      "notion"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/notion-research-documentation",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/notion-research-documentation"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/notion-research-documentation",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/notion-research-documentation"
+    }
+  },
+  {
+    "id": "skill:notion-spec-to-implementation",
+    "kind": "skill",
+    "name": "Notion Spec To Implementation",
+    "description": "OpenAI curated Codex skill: notion-spec-to-implementation.",
+    "provider": "openai",
+    "capabilities": [
+      "docs"
+    ],
+    "compatibility": [
+      "general",
+      "notion"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/notion-spec-to-implementation",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/notion-spec-to-implementation"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/notion-spec-to-implementation",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/notion-spec-to-implementation"
+    }
+  },
+  {
+    "id": "skill:openai-docs",
+    "kind": "skill",
+    "name": "Openai Docs",
+    "description": "OpenAI curated Codex skill: openai-docs.",
+    "provider": "openai",
+    "capabilities": [
+      "docs"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/openai-docs",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/openai-docs"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/openai-docs",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/openai-docs"
+    }
+  },
+  {
+    "id": "skill:pdf",
+    "kind": "skill",
+    "name": "Pdf",
+    "description": "OpenAI curated Codex skill: pdf.",
+    "provider": "openai",
+    "capabilities": [
+      "content"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/pdf",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/pdf"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/pdf",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/pdf"
+    }
+  },
+  {
+    "id": "skill:playwright",
+    "kind": "skill",
+    "name": "Playwright",
+    "description": "OpenAI curated Codex skill: playwright.",
+    "provider": "openai",
+    "capabilities": [
+      "browser-control"
+    ],
+    "compatibility": [
+      "general",
+      "node"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/playwright",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/playwright"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/playwright",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/playwright"
+    }
+  },
+  {
     "id": "skill:release-readiness",
     "kind": "skill",
     "name": "Release Readiness",
@@ -121,7 +760,7 @@
       "node"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-25",
+    "lastSeenAt": "2026-02-26",
     "install": {
       "kind": "skill.sh",
       "target": "release-readiness",
@@ -141,6 +780,76 @@
     "metadata": {}
   },
   {
+    "id": "skill:render-deploy",
+    "kind": "skill",
+    "name": "Render Deploy",
+    "description": "OpenAI curated Codex skill: render-deploy.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/render-deploy",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/render-deploy"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/render-deploy",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/render-deploy"
+    }
+  },
+  {
+    "id": "skill:screenshot",
+    "kind": "skill",
+    "name": "Screenshot",
+    "description": "OpenAI curated Codex skill: screenshot.",
+    "provider": "openai",
+    "capabilities": [
+      "browser-control"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/screenshot",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/screenshot"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/screenshot",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/screenshot"
+    }
+  },
+  {
     "id": "skill:secure-prompting",
     "kind": "skill",
     "name": "Secure Prompting",
@@ -157,7 +866,7 @@
       "python"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-25",
+    "lastSeenAt": "2026-02-26",
     "install": {
       "kind": "skill.sh",
       "target": "secure-prompting",
@@ -177,6 +886,251 @@
     "metadata": {}
   },
   {
+    "id": "skill:security-best-practices",
+    "kind": "skill",
+    "name": "Security Best Practices",
+    "description": "OpenAI curated Codex skill: security-best-practices.",
+    "provider": "openai",
+    "capabilities": [
+      "security"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/security-best-practices",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/security-best-practices"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/security-best-practices",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/security-best-practices"
+    }
+  },
+  {
+    "id": "skill:security-ownership-map",
+    "kind": "skill",
+    "name": "Security Ownership Map",
+    "description": "OpenAI curated Codex skill: security-ownership-map.",
+    "provider": "openai",
+    "capabilities": [
+      "security"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/security-ownership-map",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/security-ownership-map"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/security-ownership-map",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/security-ownership-map"
+    }
+  },
+  {
+    "id": "skill:security-threat-model",
+    "kind": "skill",
+    "name": "Security Threat Model",
+    "description": "OpenAI curated Codex skill: security-threat-model.",
+    "provider": "openai",
+    "capabilities": [
+      "security"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/security-threat-model",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/security-threat-model"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/security-threat-model",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/security-threat-model"
+    }
+  },
+  {
+    "id": "skill:sentry",
+    "kind": "skill",
+    "name": "Sentry",
+    "description": "OpenAI curated Codex skill: sentry.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/sentry",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/sentry"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/sentry",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/sentry"
+    }
+  },
+  {
+    "id": "skill:sora",
+    "kind": "skill",
+    "name": "Sora",
+    "description": "OpenAI curated Codex skill: sora.",
+    "provider": "openai",
+    "capabilities": [
+      "content"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/sora",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/sora"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/sora",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/sora"
+    }
+  },
+  {
+    "id": "skill:speech",
+    "kind": "skill",
+    "name": "Speech",
+    "description": "OpenAI curated Codex skill: speech.",
+    "provider": "openai",
+    "capabilities": [
+      "content"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/speech",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/speech"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/speech",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/speech"
+    }
+  },
+  {
+    "id": "skill:spreadsheet",
+    "kind": "skill",
+    "name": "Spreadsheet",
+    "description": "OpenAI curated Codex skill: spreadsheet.",
+    "provider": "openai",
+    "capabilities": [
+      "content"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/spreadsheet",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/spreadsheet"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/spreadsheet",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/spreadsheet"
+    }
+  },
+  {
     "id": "skill:threat-modeling-lite",
     "kind": "skill",
     "name": "Threat Modeling Lite",
@@ -193,7 +1147,7 @@
       "python"
     ],
     "source": "community-skills-index",
-    "lastSeenAt": "2026-02-25",
+    "lastSeenAt": "2026-02-26",
     "install": {
       "kind": "skill.sh",
       "target": "threat-modeling-lite",
@@ -211,5 +1165,110 @@
       "integrityAlerts": 0
     },
     "metadata": {}
+  },
+  {
+    "id": "skill:transcribe",
+    "kind": "skill",
+    "name": "Transcribe",
+    "description": "OpenAI curated Codex skill: transcribe.",
+    "provider": "openai",
+    "capabilities": [
+      "content"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/transcribe",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/transcribe"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/transcribe",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/transcribe"
+    }
+  },
+  {
+    "id": "skill:vercel-deploy",
+    "kind": "skill",
+    "name": "Vercel Deploy",
+    "description": "OpenAI curated Codex skill: vercel-deploy.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/vercel-deploy",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/vercel-deploy"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/vercel-deploy",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/vercel-deploy"
+    }
+  },
+  {
+    "id": "skill:yeet",
+    "kind": "skill",
+    "name": "Yeet",
+    "description": "OpenAI curated Codex skill: yeet.",
+    "provider": "openai",
+    "capabilities": [
+      "automation"
+    ],
+    "compatibility": [
+      "general"
+    ],
+    "source": "openai-skills-curated",
+    "lastSeenAt": "2026-02-26",
+    "install": {
+      "kind": "manual",
+      "instructions": "Install with skill-installer from openai/skills path skills/.curated/yeet",
+      "url": "https://github.com/openai/skills/tree/main/skills/.curated/yeet"
+    },
+    "adoptionSignal": 72,
+    "maintenanceSignal": 82,
+    "provenanceSignal": 96,
+    "freshnessSignal": 80,
+    "securitySignals": {
+      "knownVulnerabilities": 0,
+      "suspiciousPatterns": 0,
+      "injectionFindings": 0,
+      "exfiltrationSignals": 0,
+      "integrityAlerts": 0
+    },
+    "metadata": {
+      "githubPath": "skills/.curated/yeet",
+      "githubUrl": "https://github.com/openai/skills/tree/main/skills/.curated/yeet"
+    }
   }
 ]
