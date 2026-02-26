@@ -15,7 +15,7 @@
   <a href="https://github.com/amitrintzler/skills-and-mcps/actions/workflows/catalog-sync.yml"><img alt="Catalog Sync (Scheduled)" src="https://img.shields.io/badge/catalog%20sync-scheduled-0ea5e9" /></a>
 </p>
 
-Toolkit helps teams discover, score, and safely install Skills, MCP servers, and plugins with policy-aware risk controls.
+Toolkit helps teams discover, score, and safely install Claude plugins, Copilot extensions, Skills, and MCP servers with policy-aware risk controls.
 
 Quick links:
 - [Install](#install-toolkit-v020)
@@ -29,7 +29,7 @@ Quick links:
 Toolkit is a Node.js CLI that unifies multiple AI tooling ecosystems into one searchable catalog and applies trust/risk policy before installation.
 
 You can:
-- Discover Skills, MCP servers, Claude plugins, and Copilot extensions from one place.
+- Discover Claude plugins, Copilot extensions, Skills, and MCP servers from one place.
 - Score candidates using trust-first ranking.
 - Enforce install gates using whitelist + quarantine policy.
 - Run continuous checks in CI and scheduled workflows.
@@ -57,6 +57,9 @@ npm run init
 npm run doctor
 ```
 
+`init` now defaults kinds to all ecosystems: `skill`, `mcp`, `claude-plugin`, and `copilot-extension`.
+When you choose `riskPosture: strict`, `list` and `recommend` default to safe-only output.
+
 Install newest release tag instead of pinning `v0.2.0`:
 
 ```bash
@@ -71,7 +74,12 @@ npm run init
 npm run doctor
 npm run scan -- --project . --format table
 npm run recommend -- --project . --only-safe --sort trust --limit 10
+npm run recommend -- --project . --only-safe --sort trust --limit 10 --details
 ```
+
+If installed as a CLI package, run `toolkit` with no args to open a branded home screen.
+
+Toolkit also performs a daily interactive update check against GitHub Releases and prints a download hint when a newer release is available.
 
 ## Typical Workflow
 
@@ -105,10 +113,20 @@ skill:ci-hardening                skill               openai      low(0)    fals
 | `npm run sync` | Refresh catalog data from configured registries |
 | `npm run scan -- --project . --format table` | Analyze repository capabilities/archetype |
 | `npm run top -- --project . --limit 5` | Show top-ranked items for the current context |
+| `npm run top -- --project . --limit 5 --details` | Explain rank math, trust/risk interpretation, and install hint per item |
 | `npm run recommend -- --project . --only-safe --sort trust --limit 10` | Generate policy-aware recommendations |
+| `npm run recommend -- --project . --only-safe --sort trust --limit 10 --details` | Include per-item acceptance evidence (provenance, reasons, tradeoffs) |
 | `npm run assess -- --id <catalog-id>` | Evaluate risk for one candidate before install |
 | `npm run install:item -- --id <catalog-id> --yes` | Install a candidate if policy allows |
 | `npm run status -- --verbose` | Report catalog health, staleness, and policy status |
+| `node dist/cli.js web --open` | Generate readable HTML report with score legend and decision cards |
+
+Packaged CLI-only commands:
+
+- `toolkit` (home screen)
+- `toolkit upgrade check`
+- `toolkit web --open` (readable browser report)
+- `toolkit <command> --no-update-check` (skip daily auto-check for the current run)
 
 Full command reference: [`docs/cli-reference.md`](docs/cli-reference.md)
 
@@ -123,9 +141,25 @@ Toolkit blocks high-risk and critical installs by default.
 | high | 50-74 | block |
 | critical | 75-100 | block |
 
+Risk score meaning:
+- `0` is lowest observed risk signal.
+- `100` is highest risk signal.
+- Higher score means higher risk and stronger install gating.
+
 Whitelist and quarantine state are enforced in recommendation and install flows, and can be continuously maintained with daily verification/quarantine automation.
 
 Security deep-dive: [`docs/security/README.md`](docs/security/README.md)
+
+## Plugin Catalog Sources
+
+- Claude connectors: `https://claude.com/connectors` (scraped with sanitization + host allowlist guards)
+- Copilot plugins (official): `https://raw.githubusercontent.com/github/copilot-plugins/main/.github/plugin/marketplace.json`
+- Copilot plugins (curated): `https://raw.githubusercontent.com/github/awesome-copilot/main/.github/plugin/marketplace.json`
+
+Legacy endpoints returning `404` are not used for sync anymore:
+
+- `https://api.anthropic.com/v1/plugins/catalog`
+- `https://api.github.com/copilot/extensions/catalog`
 
 ## Where To Go Next
 

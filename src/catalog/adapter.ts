@@ -1,5 +1,7 @@
 import type { Registry } from '../lib/validation/contracts.js';
+import { adaptClaudeConnectorsScrapeEntries } from './adapters/claude-connectors-scrape-v1.js';
 import { adaptClaudePluginsEntries } from './adapters/claude-plugins-v0.1.js';
+import { adaptCopilotPluginMarketplaceEntries } from './adapters/copilot-plugin-marketplace-v1.js';
 import { adaptCopilotExtensionsEntries } from './adapters/copilot-extensions-v0.1.js';
 import { adaptMcpRegistryEntries } from './adapters/mcp-registry-v0.1.js';
 import { adaptOpenAiSkillsGitHubEntries } from './adapters/openai-skills-github-v1.js';
@@ -24,6 +26,14 @@ export function adaptRegistryEntries(registry: Registry, entries: unknown[]): un
 
   if (registry.adapter === 'copilot-extensions-v0.1') {
     return adaptCopilotExtensionsEntries(registry.id, entries);
+  }
+
+  if (registry.adapter === 'copilot-plugin-marketplace-v1') {
+    return adaptCopilotPluginMarketplaceEntries(registry.id, entries);
+  }
+
+  if (registry.adapter === 'claude-connectors-scrape-v1') {
+    return adaptClaudeConnectorsScrapeEntries(registry.id, entries);
   }
 
   return entries;

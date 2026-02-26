@@ -5,6 +5,7 @@ import { loadSecurityPolicy } from '../config/runtime.js';
 import { loadCatalogItemById } from '../catalog/repository.js';
 import { logger } from '../lib/logger.js';
 import { writeJsonFile } from '../lib/json.js';
+import { getStatePath } from '../lib/paths.js';
 import { InstallAuditSchema, type InstallAudit } from '../lib/validation/contracts.js';
 import { buildAssessment, isBlockedTier, isWarnTier } from '../security/assessment.js';
 
@@ -127,7 +128,7 @@ function ensureBinaryAvailable(binary: string, suggestion: string): void {
 async function persistAudit(record: InstallAudit): Promise<InstallAudit> {
   const parsed = InstallAuditSchema.parse(record);
   const stamp = parsed.requestedAt.replace(/[:.]/g, '-');
-  const file = `data/security-reports/audits/${stamp}-${parsed.id.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
+  const file = getStatePath(`data/security-reports/audits/${stamp}-${parsed.id.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`);
   await writeJsonFile(file, parsed);
   return parsed;
 }

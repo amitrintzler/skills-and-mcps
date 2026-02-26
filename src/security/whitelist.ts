@@ -7,6 +7,7 @@ import { loadCatalogItemById, loadWhitelist, saveQuarantine, saveWhitelist } fro
 import { getStaleRegistries, loadSyncState } from '../catalog/sync-state.js';
 import { writeJsonFile, readJsonFile } from '../lib/json.js';
 import { logger } from '../lib/logger.js';
+import { getStatePath } from '../lib/paths.js';
 import { SecurityReportSchema, type QuarantineEntry, type SecurityReport } from '../lib/validation/contracts.js';
 import { buildAssessment, isBlockedTier } from './assessment.js';
 
@@ -51,7 +52,7 @@ export async function verifyWhitelist(): Promise<{ reportPath: string; report: S
   });
 
   const date = report.generatedAt.slice(0, 10);
-  const reportPath = path.resolve(`data/security-reports/${date}/report.json`);
+  const reportPath = getStatePath(`data/security-reports/${date}/report.json`);
   await fs.ensureDir(path.dirname(reportPath));
   await writeJsonFile(reportPath, report);
   logger.info(`Whitelist verification report written: ${reportPath}`);

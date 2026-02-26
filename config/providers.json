@@ -34,7 +34,7 @@
     {
       "id": "github",
       "enabled": true,
-      "officialOnly": true,
+      "officialOnly": false,
       "authEnv": "GITHUB_TOKEN",
       "trustLevel": "high",
       "poll": {

@@ -112,7 +112,7 @@ export const InstallAuditSchema = z.object({
 
 export const RemoteRegistrySchema = z.object({
   url: z.string().url(),
-  format: z.enum(['json-array', 'catalog-json']).default('json-array'),
+  format: z.enum(['json-array', 'catalog-json', 'html']).default('json-array'),
   entryPath: z.string().min(1).optional(),
   supportsUpdatedSince: z.boolean().default(false),
   updatedSinceParam: z.string().min(1).default('updated_since'),
@@ -144,7 +144,9 @@ export const RegistrySchema = z.object({
       'openai-skills-v1',
       'openai-skills-github-v1',
       'claude-plugins-v0.1',
-      'copilot-extensions-v0.1'
+      'copilot-extensions-v0.1',
+      'copilot-plugin-marketplace-v1',
+      'claude-connectors-scrape-v1'
     ])
     .default('direct'),
   enabled: z.boolean().default(true),

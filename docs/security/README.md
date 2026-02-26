@@ -30,6 +30,26 @@ Toolkit enforces a trust-first model with policy gates, whitelist verification, 
 
 Use `--override-risk` only for explicit risk acceptance.
 
+## Source Trust Tiers
+
+Toolkit attaches source-confidence metadata and penalties during ranking:
+
+- `official`: vendor/public-index feeds (no extra source penalty).
+- `vetted-curated`: curated community manifests (small trust penalty).
+- `scraped`: connector scrape-derived entries (extra trust penalty + stricter review expectations).
+
+Additional safeguards for scrape-enabled plugin ingestion:
+
+- Host allowlist for plugin/MCP remotes.
+- HTTPS URL enforcement.
+- Input sanitization and duplicate ID rejection.
+- Fallback to local/last-good data when remote fetch/parsing fails.
+
+Copilot app-type extension deprecation context:
+
+- GitHub announced app-type Copilot extensions deprecation on September 4, 2025.
+- Toolkit currently ingests marketplace manifests and marks provenance so teams can govern migration risk explicitly.
+
 ## Related Docs
 
 - Scoring details: [`scoring.md`](scoring.md)

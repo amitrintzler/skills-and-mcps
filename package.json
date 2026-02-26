@@ -1,9 +1,20 @@
 {
   "name": "toolkit",
   "version": "0.2.0",
-  "description": "Toolkit: Skills + MCP + Plugin security intelligence framework",
+  "description": "Toolkit: Claude plugins + Copilot extensions + Skills + MCP security intelligence framework",
   "private": false,
   "type": "module",
+  "bin": {
+    "toolkit": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "config",
+    "data",
+    "assets/cli",
+    "README.md",
+    "LICENSE*"
+  ],
   "engines": {
     "node": ">=18.17"
   },
@@ -12,7 +23,9 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
     "test": "vitest run",
-    "verify:claims": "vitest run tests/integration/functionality-claims.spec.ts tests/unit/workflow-contracts.spec.ts tests/integration/cli-flow.spec.ts tests/unit/recommendation.spec.ts tests/unit/project-analysis.spec.ts",
+    "verify:claims": "vitest run --maxWorkers=1 tests/integration/functionality-claims.spec.ts tests/unit/workflow-contracts.spec.ts tests/integration/cli-flow.spec.ts tests/unit/recommendation.spec.ts tests/unit/project-analysis.spec.ts",
+    "smoke:pack": "node ./scripts/smoke-pack.mjs",
+    "prepush:local": "npm run lint && npm run build && npm run verify:claims && npm run smoke:pack",
     "test:watch": "vitest",
     "validate:data": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/validate-data.ts",
     "ingest:skills": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/commands/ingest.ts --kind skill",
@@ -31,6 +44,7 @@
     "scan": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts scan",
     "show": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts show",
     "top": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts top",
+    "web": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts web",
     "video:preview": "remotion studio src/video/index.ts",
     "video:render": "remotion render src/video/index.ts FrameworkWalkthrough out/framework-walkthrough.mp4",
     "recommend": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm src/cli.ts recommend",
@@ -47,10 +61,12 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "remotion": "4.0.427",
+    "semver": "^7.7.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
+    "@types/semver": "^7.7.1",
     "@typescript-eslint/eslint-plugin": "^7.10.0",
     "@typescript-eslint/parser": "^7.10.0",
     "eslint": "^8.57.0",

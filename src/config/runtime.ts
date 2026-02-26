@@ -1,6 +1,5 @@
-import path from 'node:path';
-
 import { readJsonFile } from '../lib/json.js';
+import { getPackagePath } from '../lib/paths.js';
 import {
   ItemInsightsFileSchema,
   ProvidersFileSchema,
@@ -15,12 +14,12 @@ import {
   type SecurityPolicy
 } from '../lib/validation/contracts.js';
 
-const REGISTRIES_PATH = path.resolve('config/registries.json');
-const SECURITY_POLICY_PATH = path.resolve('config/security-policy.json');
-const RANKING_POLICY_PATH = path.resolve('config/ranking-policy.json');
-const RECOMMENDATION_WEIGHTS_PATH = path.resolve('config/recommendation-weights.json');
-const PROVIDERS_PATH = path.resolve('config/providers.json');
-const ITEM_INSIGHTS_PATH = path.resolve('config/item-insights.json');
+const REGISTRIES_PATH = getPackagePath('config/registries.json');
+const SECURITY_POLICY_PATH = getPackagePath('config/security-policy.json');
+const RANKING_POLICY_PATH = getPackagePath('config/ranking-policy.json');
+const RECOMMENDATION_WEIGHTS_PATH = getPackagePath('config/recommendation-weights.json');
+const PROVIDERS_PATH = getPackagePath('config/providers.json');
+const ITEM_INSIGHTS_PATH = getPackagePath('config/item-insights.json');
 
 export async function loadRegistries(): Promise<Registry[]> {
   const raw = await readJsonFile<unknown>(REGISTRIES_PATH);

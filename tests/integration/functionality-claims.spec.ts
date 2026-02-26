@@ -1,9 +1,12 @@
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import * as repository from '../../src/catalog/repository.js';
 import { syncCatalogs } from '../../src/catalog/sync.js';
+import { getSyncStatePath } from '../../src/catalog/sync-state.js';
 import { loadRegistries } from '../../src/config/runtime.js';
 import { installWithSkillSh } from '../../src/install/skillsh.js';
 import { recommend } from '../../src/recommendation/engine.js';
@@ -11,15 +14,9 @@ import { detectProjectSignals } from '../../src/recommendation/project-analysis.
 import { loadRequirementsProfile } from '../../src/recommendation/requirements.js';
 import type { CatalogKind, Recommendation } from '../../src/lib/validation/contracts.js';
 
-const SYNC_STATE_PATH = 'data/catalog/sync-state.json';
-const SNAPSHOT_PATHS = [
-  repository.WHITELIST_PATH,
-  repository.QUARANTINE_PATH,
-  repository.ITEMS_PATH,
-  repository.SKILLS_PATH,
-  repository.MCPS_PATH,
-  SYNC_STATE_PATH
-];
+const TOOLKIT_HOME = path.resolve(
+  path.join(os.tmpdir(), `toolkit-functionality-claims-${process.pid}-${Math.random().toString(16).slice(2)}`)
+);
 type FileSnapshot = { exists: boolean; content: string };
 const snapshots = new Map<string, FileSnapshot>();
 
@@ -27,6 +24,7 @@ const REQUIRED_KINDS: CatalogKind[] = ['skill', 'mcp', 'claude-plugin', 'copilot
 const PROJECT_FIXTURE = 'tests/fixtures/project-node';
 const REQUIREMENTS_FIXTURE = 'tests/fixtures/requirements.yml';
 
+let previousToolkitHome: string | undefined;
 let previousOffline: string | undefined;
 let previousToday: string | undefined;
 let previousDryRun: string | undefined;
@@ -63,6 +61,21 @@ async function restoreFile(filePath: string): Promise<void> {
   await fs.writeFile(filePath, snapshot.content, 'utf8');
 }
 
+function getSnapshotPaths(): string[] {
+  return [
+    repository.getWhitelistPath(),
+    repository.getQuarantinePath(),
+    repository.getItemsPath(),
+    repository.getSkillsPath(),
+    repository.getMcpsPath(),
+    getSyncStatePath()
+  ];
+}
+
+function getPerTestRestorePaths(): string[] {
+  return [repository.getWhitelistPath(), repository.getQuarantinePath()];
+}
+
 async function rank(kind?: CatalogKind): Promise<Recommendation[]> {
   const [projectSignals, requirements] = await Promise.all([
     detectProjectSignals(PROJECT_FIXTURE),
@@ -73,7 +86,9 @@ async function rank(kind?: CatalogKind): Promise<Recommendation[]> {
 }
 
 beforeAll(async () => {
-  await Promise.all(SNAPSHOT_PATHS.map((filePath) => snapshotFile(filePath)));
+  previousToolkitHome = process.env.TOOLKIT_HOME;
+  process.env.TOOLKIT_HOME = TOOLKIT_HOME;
+  await Promise.all(getSnapshotPaths().map((filePath) => snapshotFile(filePath)));
 
   previousOffline = process.env.SKILLS_MCPS_SYNC_OFFLINE;
   previousToday = process.env.SKILLS_MCPS_SYNC_TODAY;
@@ -87,8 +102,12 @@ beforeAll(async () => {
   await syncCatalogs(effectiveToday);
 });
 
+afterEach(async () => {
+  await Promise.all(getPerTestRestorePaths().map((filePath) => restoreFile(filePath)));
+});
+
 afterAll(async () => {
-  await Promise.all(SNAPSHOT_PATHS.map((filePath) => restoreFile(filePath)));
+  await Promise.all(getSnapshotPaths().map((filePath) => restoreFile(filePath)));
 
   if (previousOffline === undefined) {
     delete process.env.SKILLS_MCPS_SYNC_OFFLINE;
@@ -108,6 +127,13 @@ afterAll(async () => {
     process.env.SKILLS_MCPS_INSTALL_DRY_RUN = previousDryRun;
   }
 
+  if (previousToolkitHome === undefined) {
+    delete process.env.TOOLKIT_HOME;
+  } else {
+    process.env.TOOLKIT_HOME = previousToolkitHome;
+  }
+
+  await fs.rm(TOOLKIT_HOME, { recursive: true, force: true });
 });
 
 describe('functionality claims', () => {

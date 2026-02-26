@@ -2,6 +2,7 @@ import type { SourceDescriptor } from '../config/sources.js';
 import { loadSourcesConfig } from '../config/sources.js';
 import { readJsonFile, writeJsonFile } from '../lib/json.js';
 import { logger } from '../lib/logger.js';
+import { getStatePath } from '../lib/paths.js';
 import type { SkillRecord } from '../models/records.js';
 import { SkillSchema } from '../models/records.js';
 
@@ -10,7 +11,7 @@ interface SkillSourceRecord {
   record: SkillRecord;
 }
 
-const OUTPUT_PATH = 'data/curated/skills.json';
+const OUTPUT_PATH = getStatePath('data/curated/skills.json');
 
 export async function ingestSkills(): Promise<SkillRecord[]> {
   const { skills } = await loadSourcesConfig();

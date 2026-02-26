@@ -1,8 +1,13 @@
 import fs from 'fs-extra';
 
 import { readJsonFile, writeJsonFile } from '../lib/json.js';
+import { getStatePath } from '../lib/paths.js';
 
-const SYNC_STATE_PATH = 'data/catalog/sync-state.json';
+const SYNC_STATE_REL_PATH = 'data/catalog/sync-state.json';
+
+export function getSyncStatePath(): string {
+  return getStatePath(SYNC_STATE_REL_PATH);
+}
 
 interface RegistrySyncState {
   lastUpdatedSince?: string;
@@ -16,11 +21,12 @@ interface SyncStateFile {
 const EMPTY_STATE: SyncStateFile = { registries: {} };
 
 export async function loadSyncState(): Promise<SyncStateFile> {
-  if (!(await fs.pathExists(SYNC_STATE_PATH))) {
+  const syncStatePath = getSyncStatePath();
+  if (!(await fs.pathExists(syncStatePath))) {
     return EMPTY_STATE;
   }
 
-  const raw = await readJsonFile<unknown>(SYNC_STATE_PATH);
+  const raw = await readJsonFile<unknown>(syncStatePath);
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     return EMPTY_STATE;
   }
@@ -30,7 +36,7 @@ export async function loadSyncState(): Promise<SyncStateFile> {
 }
 
 export async function saveSyncState(state: SyncStateFile): Promise<void> {
-  await writeJsonFile(SYNC_STATE_PATH, state);
+  await writeJsonFile(getSyncStatePath(), state);
 }
 
 export function getUpdatedSince(state: SyncStateFile, registryId: string): string | undefined {

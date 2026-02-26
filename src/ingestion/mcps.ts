@@ -2,6 +2,7 @@ import type { SourceDescriptor } from '../config/sources.js';
 import { loadSourcesConfig } from '../config/sources.js';
 import { readJsonFile, writeJsonFile } from '../lib/json.js';
 import { logger } from '../lib/logger.js';
+import { getStatePath } from '../lib/paths.js';
 import type { McpRecord } from '../models/records.js';
 import { McpSchema } from '../models/records.js';
 
@@ -10,7 +11,7 @@ interface McpSourceRecord {
   record: McpRecord;
 }
 
-const OUTPUT_PATH = 'data/curated/mcps.json';
+const OUTPUT_PATH = getStatePath('data/curated/mcps.json');
 
 export async function ingestMcps(): Promise<McpRecord[]> {
   const { mcps } = await loadSourcesConfig();
