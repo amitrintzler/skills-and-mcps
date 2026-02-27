@@ -112,3 +112,106 @@ jobs:
             } catch (error) {
               core.warning(`Could not apply ci-failed label: ${error.message}`);
             }
+
+  recover:
+    name: Clear CI Failure State
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Remove ci-failed label and mark failure comment as resolved
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- ci-failure-notify -->';
+            const run = context.payload.workflow_run;
+            const prs = run.pull_requests || [];
+            if (!prs.length) {
+              core.info('No pull request linked to this successful workflow run.');
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = prs[0].number;
+            const prResp = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            const pr = prResp.data;
+
+            const checkRuns = await github.paginate(github.rest.checks.listForRef, {
+              owner,
+              repo,
+              ref: pr.head.sha,
+              per_page: 100
+            });
+
+            const latestByName = new Map();
+            for (const check of checkRuns) {
+              if (!latestByName.has(check.name)) {
+                latestByName.set(check.name, check);
+              }
+            }
+            const latestChecks = Array.from(latestByName.values());
+
+            const failedConclusions = new Set(['failure', 'timed_out', 'cancelled', 'startup_failure', 'action_required']);
+            const hasFailing = latestChecks.some(
+              (check) => check.status === 'completed' && failedConclusions.has(check.conclusion || '')
+            );
+            const hasPending = latestChecks.some(
+              (check) => check.status !== 'completed' || check.conclusion == null
+            );
+
+            if (hasFailing || hasPending) {
+              core.info(`PR #${prNumber} still has failing/pending checks; not clearing ci-failed label.`);
+              return;
+            }
+
+            try {
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number: prNumber,
+                name: 'ci-failed'
+              });
+              core.info(`Removed ci-failed label from PR #${prNumber}.`);
+            } catch (error) {
+              core.info(`ci-failed label not present on PR #${prNumber} or could not be removed: ${error.message}`);
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: prNumber,
+              per_page: 100
+            });
+
+            const existing = comments.find(
+              (comment) =>
+                comment.user?.login === 'github-actions[bot]' &&
+                typeof comment.body === 'string' &&
+                comment.body.includes(marker)
+            );
+
+            if (!existing) {
+              core.info('No existing ci-failure-notify comment to update.');
+              return;
+            }
+
+            const body = [
+              marker,
+              'CI recovered for this PR.',
+              '',
+              `- Recovery workflow: ${run.name}`,
+              `- Run: ${run.html_url}`,
+              '- Status: all currently observed checks completed successfully.',
+              '',
+              'The `ci-failed` label has been removed automatically.'
+            ].join('\n');
+
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: existing.id,
+              body
+            });
