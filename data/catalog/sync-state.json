@@ -1,20 +1,29 @@
 {
   "registries": {
     "community-skills-index": {
-      "lastSuccessfulSyncAt": "2026-02-26T04:18:41.094Z"
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:15.400Z"
     },
     "public-mcp-directory": {
-      "lastSuccessfulSyncAt": "2026-02-26T04:18:45.129Z",
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:19.281Z",
       "lastUpdatedSince": "2026-02-25T14:46:42.122Z"
     },
     "official-claude-plugins": {
-      "lastSuccessfulSyncAt": "2026-02-26T04:18:45.204Z"
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:19.333Z"
     },
     "official-copilot-extensions": {
-      "lastSuccessfulSyncAt": "2026-02-26T04:18:45.205Z"
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:19.334Z"
     },
     "openai-skills-curated": {
-      "lastSuccessfulSyncAt": "2026-02-26T04:18:45.204Z"
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:19.333Z"
+    },
+    "github-copilot-plugins-official": {
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:19.342Z"
+    },
+    "github-awesome-copilot-marketplace": {
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:19.352Z"
+    },
+    "anthropic-claude-connectors-scrape": {
+      "lastSuccessfulSyncAt": "2026-02-28T03:56:19.501Z"
     }
   }
 }
